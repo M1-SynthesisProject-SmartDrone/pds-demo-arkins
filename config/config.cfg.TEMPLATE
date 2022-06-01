@@ -1,0 +1,9 @@
+version = "1.0"
+
+window:
+{
+    name = "Arkins Demo";
+    width = 640;
+    height = 480;
+    framerate = 10;
+};
