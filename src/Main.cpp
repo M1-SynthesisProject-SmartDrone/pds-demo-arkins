@@ -18,16 +18,14 @@ int main(int argc, char *argv[])
     auto height = params.window.height;
     auto windowName = params.window.name;
     auto framerate = params.window.framerate;
-    
-    const float SPEED = width / 10.0f;
-
-    // Create the window, set the framerate and center it
     sf::RenderWindow window(sf::VideoMode(width, height), windowName);
     window.setFramerateLimit(framerate);
     window.setPosition(sf::Vector2i(
         (sf::VideoMode::getDesktopMode().width/2) - (width / 2),
         (sf::VideoMode::getDesktopMode().height/2) - (height / 2)
     ));
+
+    const float SPEED = width / 10.0f;
     
     // Base rectangle, put at left center of the screen
     sf::RectangleShape rectangle(sf::Vector2f(width / 4, height / 4));

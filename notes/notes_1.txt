@@ -1,0 +1,21 @@
+==== Ce qui doit se passer ===
+    - On doit créer une map
+        * Une liste de points attractifs, répulsifs, tangentiels & champs uniformes
+        * Position du drone
+    - Quand on lance le programme, il commence en pause
+        * On voit la map, les points, le drone, une légende ?
+    - Quand on enlève la pause (P), surprise ! Le drone bouge
+    - Une fois que le trajet est terminé (plus de points à atteindre), on remet la pause
+    - Possibilité de recommencer (R) tout le temps, de changer la vitesse (UP / DOWN)
+
+==== On a besoin ====
+    - D'un moyen de gérer les sprites (ptetre que seul le drone aura un sprite, qui sait)
+    - De classes entités
+        * Drone, champ attratif, etc.
+        * Tous dérivés d'une classe abstraite avec une méthode draw(window&)
+    - D'une classe pour gérer la logique
+        * Gérer arkins
+        * Déplacer le drone
+        * Supprimer les pts etc.
+    - D'une classe pour gérer les shortcuts
+        * On aurait une struct à passer à la classe de logique avec ce sur quoi on a appuyé ?
