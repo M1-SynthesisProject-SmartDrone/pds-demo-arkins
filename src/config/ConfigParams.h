@@ -8,12 +8,14 @@ struct ConfigWindow
     std::string name;
     int width;
     int height;
+    bool enableVsync;
     int framerate;
 };
 
 struct ConfigImage
 {
     std::string folderPath;
+    bool enableSmooth;
 };
 
 /**

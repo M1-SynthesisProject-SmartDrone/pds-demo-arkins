@@ -4,6 +4,7 @@
 
 #include "config/ConfigParser.h"
 #include "gui/events/event_manager.h"
+#include "gui/renderer/Renderer.h"
 
 using namespace std;
 
@@ -27,12 +28,9 @@ int main(int argc, char *argv[])
     ));
     window.setVerticalSyncEnabled(params.window.enableVsync);
 
-    const float SPEED = width / 10.0f;
-    
-    // Base rectangle, put at left center of the screen
-    sf::RectangleShape rectangle(sf::Vector2f(width / 4, height / 4));
-    rectangle.setFillColor(sf::Color::Blue);
-    rectangle.setPosition(0.0f, (height / 2.0f) - (rectangle.getSize().y / 2.0f));
+    Renderer renderer(params.image, params.window);
+
+    Coordinates droneCoordinates(0.0f, 0.0f, 0.0f, 0.0f);
 
     // Background color
     sf::Color bgColor = sf::Color::White;
@@ -52,13 +50,14 @@ int main(int argc, char *argv[])
         // ==== Application logic (arkins in our case) ====
         if (!events.isPaused)
         {
-            rectangle.move(1.0f, 0.0f);
+            droneCoordinates.x += 1.0;
+            droneCoordinates.y += 1.0;
         }
         
         // ==== Rendering ====
         window.clear(bgColor);
         // Draw entities here
-        window.draw(rectangle);
+        renderer.renderDrone(droneCoordinates, window);
         // End rendering
         // As we defined framerate, we will have some sleeps calls after display
         window.display();

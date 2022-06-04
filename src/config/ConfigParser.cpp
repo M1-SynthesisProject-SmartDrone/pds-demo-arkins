@@ -46,6 +46,7 @@ ConfigParams ConfigParser::parse()
     const auto& imageSettings = root["image"];
     auto imageConfig = ConfigImage{
         imageSettings["folder"],
+        imageSettings["enable_smooth"],
     };
 
     return ConfigParams(
