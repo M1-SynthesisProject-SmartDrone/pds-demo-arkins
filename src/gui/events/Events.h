@@ -7,14 +7,17 @@
  */
 struct Events
 {
+    // Special case handled by main function
     bool isWindowClosed = false;
-    bool isPaused = false;
+
+    bool pausePressed = false;
     bool resetPressed = false;
     bool upPressed = false;
     bool downPressed = false;
 
     void reset()
     {
+        pausePressed = false;
         resetPressed = false;
         upPressed = false;
         downPressed = false;

@@ -22,7 +22,7 @@ using namespace std;
 #define RANGE 10000
 #define UNITARY_VECTOR 0.5
 #define ATTRACTION_POINTS_SIZE 10
-#define REPULSION_RADIUS 100
+#define REPULSION_RADIUS 100.0
 
 class Arkins
 {
@@ -39,6 +39,9 @@ public:
 		std::vector<Coordinates> tangentialPoints);
 
 	Informations& getInfos();
+	std::vector<Coordinates>& getAttractionPoints();
+	std::vector<Coordinates>& getRepulsionPoints();
+	std::vector<Coordinates>& getTangentialPoints();
 
 	void process(Coordinates& droneCoordinates); // Process all the environment to calculate the vector to follow
 	void deleteAttractivePoint(); // Delete an attractive point from the list [useful after visiting one of the points]

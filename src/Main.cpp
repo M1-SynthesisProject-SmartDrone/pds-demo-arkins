@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "config/ConfigParser.h"
-#include "engine/map/Map.h"
+#include "engine/Engine.h"
 #include "gui/events/event_manager.h"
 #include "gui/renderer/Renderer.h"
 
@@ -31,22 +31,9 @@ int main(int argc, char *argv[])
     ));
     window.setVerticalSyncEnabled(params.window.enableVsync);
 
-    Map map(params.map);
+    Engine engine(params.map);
 
-    // MapInfos infos{-1000.0, 1000.0, -1000.0, 1000.0, 2000.0f, 2000.0f};
-
-    Renderer renderer(params.image, params.window, map.infos);
-
-    // TODO remove this, put in engine
-    Coordinates droneCoordinates = map.droneCoordinates;
-
-    vector<Coordinates> attractivePoints = map.attractivePoints;
-
-    vector<Coordinates> repulsivePoints = map.repulsivePoints;
-
-    vector<Coordinates> tangentialPoints = map.tangentialPoints;
-    // TODO uniform
-
+    Renderer renderer(params.image, params.window, engine.getMapInfos());
 
     // Background color
     sf::Color bgColor = sf::Color::White;
@@ -64,24 +51,21 @@ int main(int argc, char *argv[])
         }
 
         // ==== Application logic (arkins in our case) ====
-        if (!events.isPaused)
-        {
-            // droneCoordinates.x += 1.0;
-            // droneCoordinates.y += 1.0;
-        }
+        engine.update(events);
+        
         
         // ==== Rendering ====
         window.clear(bgColor);
         // Draw entities here
         
         renderer.renderGrid(window);
-        renderer.renderAttractivePoints(attractivePoints, window);
-        renderer.renderRepulsivePoints(repulsivePoints, window, 100.0);
-        renderer.renderTangentialPoints(tangentialPoints, window, 100.0);
+        renderer.renderAttractivePoints(engine.getAttractivePoints(), window);
+        renderer.renderRepulsivePoints(engine.getRepulsivePoints(), window, REPULSION_RADIUS);
+        renderer.renderTangentialPoints(engine.getTangentialPoints(), window, 100.0);
         // TODO call render uniform fields
 
         // Render drone at the end, so that it is on top of all others
-        renderer.renderDrone(droneCoordinates, window);
+        renderer.renderDrone(engine.getDroneCoordinates(), window);
 
         // End rendering
         // As we defined framerate, we will have some sleeps calls after display

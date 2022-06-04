@@ -15,6 +15,21 @@ Informations& Arkins::getInfos()
 	return infos;
 }
 
+std::vector<Coordinates>& Arkins::getAttractionPoints()
+{
+	return attractionPoints;
+}
+
+std::vector<Coordinates>& Arkins::getRepulsionPoints()
+{
+	return repulsionPoints;
+}
+
+std::vector<Coordinates>& Arkins::getTangentialPoints()
+{
+	return tangentialPoints;
+}
+
 void Arkins::process(Coordinates& droneCoordinates)
 {
 	for (int attPoints = 0; attPoints < attractionPoints.size(); attPoints++)

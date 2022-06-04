@@ -17,7 +17,7 @@ void updateEvents(sf::RenderWindow& window, Events& events)
             switch (event.key.code)
             {
             case sf::Keyboard::P:
-                events.isPaused = !events.isPaused;
+                events.pausePressed = true;
                 break;
             case sf::Keyboard::R:
                 events.resetPressed = true;
