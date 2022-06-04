@@ -18,6 +18,12 @@ struct ConfigImage
     bool enableSmooth;
 };
 
+struct ConfigMap
+{
+    std::string filename;
+    float spaceArround;
+};
+
 /**
  * The struct containing all config params
  */
@@ -27,7 +33,10 @@ struct ConfigParams
 
     ConfigWindow window;
 
-    ConfigParams(ConfigWindow window, ConfigImage image) : window(window), image(image)
+    ConfigMap map;
+
+    ConfigParams(ConfigWindow window, ConfigImage image, ConfigMap map) : 
+        window(window), image(image), map(map)
     {}
 };
 

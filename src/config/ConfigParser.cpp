@@ -49,9 +49,16 @@ ConfigParams ConfigParser::parse()
         imageSettings["enable_smooth"],
     };
 
+    const auto& mapSettings = root["map"];
+    auto mapConfig = ConfigMap{
+        mapSettings["file"],
+        mapSettings["space_arround"],
+    };
+
     return ConfigParams(
         windowConfig,
-        imageConfig
+        imageConfig,
+        mapConfig
     );
 }
 

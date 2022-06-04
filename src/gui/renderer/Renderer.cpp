@@ -117,13 +117,17 @@ void Renderer::renderTangentialPoints(std::vector<Coordinates>& tangentialPoints
 float Renderer::calculateXPos(float x)
 {
     auto& m = m_mapInfos;
-    return (x / (m.maxX - m.minX)) * m_windowConfig.width;
+    float distRatio = (x - m.minX) / m.width;
+    // return ((x / m.width) * m_windowConfig.width) + (distRatio * m_windowConfig.width);
+    return (distRatio * m_windowConfig.width);
 }
 
 float Renderer::calculateYPos(float y)
 {
     auto& m = m_mapInfos;
-    return (y / (m.maxY - m.minY)) * m_windowConfig.height;
+    float distRatio = (y - m.minY) / m.height;
+    // return ((y / m.height) * m_windowConfig.height) + (distRatio * m_windowConfig.height);
+    return (distRatio * m_windowConfig.height);
 }
 
 sf::Vector2f Renderer::calculatePos(const Coordinates& coordinates)
@@ -137,7 +141,7 @@ sf::Vector2f Renderer::calculatePos(const Coordinates& coordinates)
 float Renderer::calculateRadius(float r)
 {
     auto& m = m_mapInfos;
-    return (r / (m.maxX - m.minX)) * m_windowConfig.width;
+    return (r / m.width) * m_windowConfig.width;
 }
 
 sf::CircleShape Renderer::createCircle(float radius, const sf::Color& color, bool colorOutline)

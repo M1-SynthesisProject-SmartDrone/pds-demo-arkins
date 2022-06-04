@@ -1,9 +1,11 @@
 
+#include <iostream>
+
 #include <loguru/loguru.hpp>
 #include <SFML/Graphics.hpp>
 
 #include "config/ConfigParser.h"
-#include "engine/map/MapInfos.h"
+#include "engine/map/Map.h"
 #include "gui/events/event_manager.h"
 #include "gui/renderer/Renderer.h"
 
@@ -29,27 +31,21 @@ int main(int argc, char *argv[])
     ));
     window.setVerticalSyncEnabled(params.window.enableVsync);
 
-    MapInfos mapInfos{0.0, 2000.0, 0.0, 2000.0};
+    Map map(params.map);
 
-    Renderer renderer(params.image, params.window, mapInfos);
+    // MapInfos infos{-1000.0, 1000.0, -1000.0, 1000.0, 2000.0f, 2000.0f};
 
-    Coordinates droneCoordinates(100.0f, 100.0f, 0.0f, 0.0f);
+    Renderer renderer(params.image, params.window, map.infos);
 
-    // TODO only for drawing test
-    vector<Coordinates> attractivePoints{
-        Coordinates{500.0, 500.0, 0.0, 0.0},
-        Coordinates{200.0, 200.0, 0.0, 0.0},
-    };
+    // TODO remove this, put in engine
+    Coordinates droneCoordinates = map.droneCoordinates;
 
-    vector<Coordinates> repulsivePoints{
-        Coordinates{700.0, 350.0, 0.0, 0.0},
-        Coordinates{1000.0, 1000.0, 0.0, 0.0},
-    };
+    vector<Coordinates> attractivePoints = map.attractivePoints;
 
-    vector<Coordinates> tangentialPoints{
-        Coordinates{1950.0, 1650.0, 0.0, 0.0},
-        Coordinates{222.0, 333.0, 0.0, 0.0},
-    };
+    vector<Coordinates> repulsivePoints = map.repulsivePoints;
+
+    vector<Coordinates> tangentialPoints = map.tangentialPoints;
+    // TODO uniform
 
 
     // Background color
@@ -82,6 +78,7 @@ int main(int argc, char *argv[])
         renderer.renderAttractivePoints(attractivePoints, window);
         renderer.renderRepulsivePoints(repulsivePoints, window, 100.0);
         renderer.renderTangentialPoints(tangentialPoints, window, 100.0);
+        // TODO call render uniform fields
 
         // Render drone at the end, so that it is on top of all others
         renderer.renderDrone(droneCoordinates, window);

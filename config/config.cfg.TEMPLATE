@@ -14,3 +14,9 @@ image:
     folder = "/path/to/folder";
     enable_smooth = true;
 };
+
+map:
+{
+    file = "/path/to/file";
+    space_arround = 100.0;
+}

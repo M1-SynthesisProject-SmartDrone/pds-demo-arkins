@@ -77,6 +77,7 @@ add_executable(${APP_NAME} ${project_SRC})
 
 target_link_libraries(${APP_NAME} PUBLIC
     loguru
+    nlohmann
     -lsfml-graphics
     -lsfml-window
     -lsfml-system

@@ -7,6 +7,8 @@ struct MapInfos
     float maxX;
     float minY;
     float maxY;
+    float width;
+    float height;
 };
 
 #endif // __MAPINFOS_H__
