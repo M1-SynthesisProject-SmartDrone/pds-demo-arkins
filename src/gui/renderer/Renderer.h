@@ -8,6 +8,7 @@
 
 #include "config/ConfigParams.h"
 #include "engine/data/Coordinates.h"
+#include "engine/map/MapInfos.h"
 
 class Renderer
 {
@@ -16,6 +17,7 @@ private:
 
     const ConfigWindow m_windowConfig;
     const ConfigImage m_imageConfig;
+    const MapInfos m_mapInfos;
     const std::filesystem::path m_imageFolderPath;
 
     // This is kept as we load an image for this element
@@ -27,11 +29,15 @@ private:
      */
     sf::Texture loadTexture(std::string baseFilename);
 
+    // ==== Position calculation from the map infos ====
+    float calculateXPos(float x);
+    float calculateYPos(float y);
+
 public:
     /**
      * This will check if the config is valid (correct image folder path, etc.)
      */ 
-    Renderer(ConfigImage imageConfig, ConfigWindow windowConfig);
+    Renderer(ConfigImage imageConfig, ConfigWindow windowConfig, MapInfos mapInfos);
     ~Renderer();
 
     void renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& window);

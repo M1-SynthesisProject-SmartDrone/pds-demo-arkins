@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "config/ConfigParser.h"
+#include "engine/map/MapInfos.h"
 #include "gui/events/event_manager.h"
 #include "gui/renderer/Renderer.h"
 
@@ -28,7 +29,9 @@ int main(int argc, char *argv[])
     ));
     window.setVerticalSyncEnabled(params.window.enableVsync);
 
-    Renderer renderer(params.image, params.window);
+    MapInfos mapInfos{0.0, 2000.0, 0.0, 2000.0};
+
+    Renderer renderer(params.image, params.window, mapInfos);
 
     Coordinates droneCoordinates(0.0f, 0.0f, 0.0f, 0.0f);
 
