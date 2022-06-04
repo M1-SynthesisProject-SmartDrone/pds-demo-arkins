@@ -17,5 +17,8 @@
         * Gérer arkins
         * Déplacer le drone
         * Supprimer les pts etc.
+            ==> Il faut supprimer le point "entité / drawable" et le point logique
     - D'une classe pour gérer les shortcuts
         * On aurait une struct à passer à la classe de logique avec ce sur quoi on a appuyé ?
+    - Un renderer avec une fonction par type de coordinate
+        * Cette classe aurait chargé toutes les textures etc.

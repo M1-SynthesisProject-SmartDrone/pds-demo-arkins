@@ -1,17 +1,10 @@
-#include "EventManager.h"
+#include "event_manager.h"
 
-EventManager::EventManager(sf::RenderWindow& window) :
-    m_window(window)
-{}
-
-EventManager::~EventManager()
-{}
-
-void EventManager::update(Events& events)
+void updateEvents(sf::RenderWindow& window, Events& events)
 {
     events.reset();
     sf::Event event;
-    while (m_window.pollEvent(event))
+    while (window.pollEvent(event))
     {
         // Close the window (CTRL-C or clicking the button)
         if (event.type == sf::Event::Closed)

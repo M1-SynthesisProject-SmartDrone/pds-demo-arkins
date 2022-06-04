@@ -11,14 +11,21 @@ struct ConfigWindow
     int framerate;
 };
 
+struct ConfigImage
+{
+    std::string folderPath;
+};
+
 /**
  * The struct containing all config params
  */
 struct ConfigParams
 {
+    ConfigImage image;
+
     ConfigWindow window;
 
-    ConfigParams(ConfigWindow window) : window(window)
+    ConfigParams(ConfigWindow window, ConfigImage image) : window(window), image(image)
     {}
 };
 

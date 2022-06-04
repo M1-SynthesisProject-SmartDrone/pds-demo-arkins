@@ -2,7 +2,8 @@
 #include <loguru/loguru.hpp>
 #include <SFML/Graphics.hpp>
 
-#include <config/ConfigParser.h>
+#include "config/ConfigParser.h"
+#include "gui/events/event_manager.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ int main(int argc, char *argv[])
         (sf::VideoMode::getDesktopMode().width/2) - (width / 2),
         (sf::VideoMode::getDesktopMode().height/2) - (height / 2)
     ));
+    window.setVerticalSyncEnabled(params.window.enableVsync);
 
     const float SPEED = width / 10.0f;
     
@@ -33,33 +35,22 @@ int main(int argc, char *argv[])
     rectangle.setPosition(0.0f, (height / 2.0f) - (rectangle.getSize().y / 2.0f));
 
     // Background color
-    sf::Color bgColor = sf::Color::Black;
+    sf::Color bgColor = sf::Color::White;
+    Events events;
 
     // Main loop
-    bool isPaused = false;
     while(window.isOpen())
     {
-        // ==== events (key, window, etc) ====
-        sf::Event event;
-        while (window.pollEvent(event))
+        updateEvents(window, events);
+
+        if (events.isWindowClosed)
         {
-            // Close the window (CTRL-C or clicking the button)
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-            // Keyboard one button press (KeyPressed is checked each frame)
-            if (event.type == sf::Event::KeyReleased)
-            {
-                if (event.key.code == sf::Keyboard::P)
-                {
-                    isPaused = !isPaused;
-                }
-            }
+            window.close();
+            continue;
         }
 
         // ==== Application logic (arkins in our case) ====
-        if (!isPaused)
+        if (!events.isPaused)
         {
             rectangle.move(1.0f, 0.0f);
         }

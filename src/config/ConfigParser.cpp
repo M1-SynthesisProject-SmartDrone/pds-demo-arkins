@@ -39,11 +39,18 @@ ConfigParams ConfigParser::parse()
         windowSettings["name"],
         windowSettings["width"],
         windowSettings["height"],
+        windowSettings["enable_vsync"],
         windowSettings["framerate"]
     };
 
+    const auto& imageSettings = root["image"];
+    auto imageConfig = ConfigImage{
+        imageSettings["folder"],
+    };
+
     return ConfigParams(
-        windowConfig
+        windowConfig,
+        imageConfig
     );
 }
 

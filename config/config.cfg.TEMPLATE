@@ -7,3 +7,8 @@ window:
     height = 480;
     framerate = 10;
 };
+
+image:
+{
+    folder = "/path/to/folder";
+};
