@@ -8,12 +8,14 @@ First, launch the `install_dependencies.sh` script in order to install every nee
 
 Next, copy the `config/config.cfg.TEMPLATE` file, renaming it to `config/config.cfg` and put the configurations wanted for this computer (the `config/config.cfg` file is not pushed to the repository).
 
-The config have references to one folder (the images one, in this repository), and to one file (the "map" to load, more on that later).
+The config have references to one folder (the images one, the folder "images" is in this repository), and to one file (the "map" to load, more on that later).
 In order to be safe, it is advised to put absolute paths instead of relative ones.
 
 Finally, you can call the `compile.sh` file in order to compile the project, creating the executable in the `bin` folder (the config.cfg created must always be aside the executable in order to work).
 
 ## The map file
+
+> One map is already available : `data/map_test.json`
 
 This is a single json file looking like this :
 
