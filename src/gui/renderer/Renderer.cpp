@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+#include <algorithm>
+#include <iostream>
+
 #include <loguru/loguru.hpp>
 
 using namespace std;
@@ -17,13 +20,17 @@ Renderer::Renderer(ConfigImage imageConfig, ConfigWindow windowConfig, MapInfos 
         ss << "The folder \"" << imageConfig.folderPath << "\" does not exists";
         throw runtime_error(ss.str());
     }
-    // m_spriteDrone
+    // Init drone
     m_droneTexture = loadTexture(DRONE_IMAGE_NAME);
     m_droneSprite.setTexture(&m_droneTexture);
     // Size of the drone depends on the window size
-    float droneWidth = m_windowConfig.width / 10.0;
-    float droneHeight = m_windowConfig.height / 10.0;
+    float droneWidth = m_windowConfig.width * 0.07f;
+    float droneHeight = m_windowConfig.height * 0.07f;
     m_droneSprite.setSize(sf::Vector2f(droneWidth, droneHeight));
+    m_droneSprite.setOrigin(sf::Vector2f(droneWidth / 2, droneHeight / 2));
+
+    // Precalculation of any point radius
+    m_pointRadius = min(m_windowConfig.width, m_windowConfig.height) * 0.025f;
 }
 
 Renderer::~Renderer()
@@ -34,7 +41,7 @@ sf::Texture Renderer::loadTexture(string baseFilename)
     fs::path baseFilePath(baseFilename);
     auto fullPath = m_imageFolderPath / baseFilePath;
     sf::Texture texture;
-    if(!texture.loadFromFile(fullPath.string()))
+    if (!texture.loadFromFile(fullPath.string()))
     {
         stringstream ss;
         ss << "Error while loading texture on path " << fullPath;
@@ -44,26 +51,67 @@ sf::Texture Renderer::loadTexture(string baseFilename)
     return texture;
 }
 
+void Renderer::renderGrid(sf::RenderWindow& window)
+{
+    float midGridThickness = GRID_THICKNESS / 2.0f;
+
+    sf::RectangleShape lineX(sf::Vector2f(m_windowConfig.width, GRID_THICKNESS));
+    sf::RectangleShape lineY(sf::Vector2f(GRID_THICKNESS, m_windowConfig.height));
+
+    lineX.setFillColor(GRID_COLOR);
+    lineY.setFillColor(GRID_COLOR);
+
+    lineY.setPosition((m_windowConfig.width / 2) - midGridThickness, 0.0f);
+    lineX.setPosition(0.0f, (m_windowConfig.height / 2) - midGridThickness);
+    window.draw(lineX);
+    window.draw(lineY);
+}
+
 void Renderer::renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& window)
 {
-    m_droneSprite.setPosition(sf::Vector2f(calculateXPos(droneCoordinates.x), calculateYPos(droneCoordinates.y)));
+    m_droneSprite.setPosition(calculatePos(droneCoordinates));
     m_droneSprite.setRotation(droneCoordinates.rotation);
     window.draw(m_droneSprite);
 }
 
 void Renderer::renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window)
 {
-
+    auto point = createCircle(m_pointRadius, ATTRACTIVE_POINT_COLOR);
+    for (const auto& c : attractivePoints)
+    {
+        point.setPosition(calculatePos(c));
+        window.draw(point);
+    }
 }
 
-void Renderer::renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window)
+void Renderer::renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window, float effectRadius)
 {
-
+    auto point = createCircle(m_pointRadius, REPULSIVE_POINT_COLOR);
+    // We add another circle to show the effect radius
+    auto effectRadiusShape = createCircle(effectRadius, REPULSIVE_POINT_COLOR, true);
+    for (const auto& c : repulsivePoints)
+    {
+        auto pos = calculatePos(c);
+        point.setPosition(pos);
+        effectRadiusShape.setPosition(pos);
+        window.draw(point);
+        window.draw(effectRadiusShape);
+    }
 }
 
-void Renderer::renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window)
+void Renderer::renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window, float effectRadius)
 {
-
+    auto point = createCircle(m_pointRadius, TANGENTIAL_POINT_COLOR);
+    // We add another circle to show the effect radius
+    auto effectRadiusShape = createCircle(effectRadius, TANGENTIAL_POINT_COLOR, true);
+    for (const auto& c : tangentialPoints)
+    {
+        auto pos = calculatePos(c);
+        point.setPosition(pos);
+        effectRadiusShape.setPosition(pos);
+        window.draw(point);
+        window.draw(effectRadiusShape);
+    }
 }
 
 float Renderer::calculateXPos(float x)
@@ -76,4 +124,36 @@ float Renderer::calculateYPos(float y)
 {
     auto& m = m_mapInfos;
     return (y / (m.maxY - m.minY)) * m_windowConfig.height;
+}
+
+sf::Vector2f Renderer::calculatePos(const Coordinates& coordinates)
+{
+    return {
+        calculateXPos(coordinates.x),
+        calculateYPos(coordinates.y)
+    };
+}
+
+float Renderer::calculateRadius(float r)
+{
+    auto& m = m_mapInfos;
+    return (r / (m.maxX - m.minX)) * m_windowConfig.width;
+}
+
+sf::CircleShape Renderer::createCircle(float radius, const sf::Color& color, bool colorOutline)
+{
+    float displayedRadius = calculateRadius(radius);
+    sf::CircleShape circle(displayedRadius);
+    if (colorOutline)
+    {
+        circle.setFillColor(sf::Color::Transparent);
+        circle.setOutlineColor(color);
+        circle.setOutlineThickness(1.0f);
+    }
+    else
+    {
+        circle.setFillColor(color);
+    }
+    circle.setOrigin(displayedRadius, displayedRadius);
+    return circle;
 }
