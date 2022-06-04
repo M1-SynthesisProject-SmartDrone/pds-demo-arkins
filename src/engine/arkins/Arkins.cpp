@@ -15,6 +15,11 @@ Informations& Arkins::getInfos()
 	return infos;
 }
 
+int Arkins::countAttractionPoints()
+{
+	return attractionPoints.size();
+}
+
 std::vector<Coordinates>& Arkins::getAttractionPoints()
 {
 	return attractionPoints;
@@ -77,13 +82,14 @@ Coordinates Arkins::calculate_barycenter(std::vector<Coordinates>& vector)
 	float sum_y = 0;
 	float sum_z = 0;
 	float sum_coef = 0;
-	for (Coordinates point : vector)
+	for (const auto& point : vector)
 	{
 		sum_x += point.attraction * point.x;
 		sum_y += point.attraction * point.y;
 		sum_z += point.attraction * point.z;
 		sum_coef += point.attraction;
 	}
+	LOG_F(INFO, "zqduqbz (But) : px: %f | py: %f | pz: %f | coef : %f", sum_x, sum_y, sum_z, sum_coef);
 	barycenter.x = sum_x / sum_coef;
 	barycenter.y = sum_y / sum_coef;
 	barycenter.z = sum_z / sum_coef;
@@ -99,14 +105,20 @@ void Arkins::calculate_dist_between_points(Coordinates& droneCoordinates, Coordi
 
 void Arkins::calculate_coefficient_attraction(std::vector<Coordinates>& vector, float maxDistance)
 {
-	float coef = 0;
-	for (auto& coordinate : vector)
+	if (vector.size() == 1)
 	{
-		coef = 1 - coordinate.distance_to_drone / maxDistance;
-		coordinate.attraction = coef; //+ on est proche du point d'attraction, + le coefficient sera grand [d'où le 1 - rapport distance/maxDistance]
+		vector[0].attraction = 1.0f;
+	}
+	else
+	{
+		for (auto& coordinate : vector)
+		{
+			float coef = 1.0f - coordinate.distance_to_drone / maxDistance;
+			// + on est proche du point d'attraction, + le coefficient sera grand [d'où le 1 - rapport distance/maxDistance]
+			coordinate.attraction = coef;
+		}
 	}
 }
-
 
 void Arkins::calculate_vector(Coordinates& droneCoordinates, Coordinates& targetCoordinates, float& x, float& y, float& z)
 {
@@ -141,7 +153,14 @@ void Arkins::calculate_rotation(float hdg, float targeted_hdg, float& r)
 	}
 }
 
-void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos, Coordinates& attractivePoint)
+float findRatio(float p, float b)
+{
+	if (p == b) return 0.0f;
+	else if (p < b) return 1.0f;
+	else return -1.0f;
+}
+
+void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos, Coordinates& barycenter)
 {
 	/*
 		Ce qui sera retourné
@@ -153,67 +172,40 @@ void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos
 	float pz = droneCoordinates.z;
 
 	// Coordonées cartésiennes du point de destination
-	float bx = attractivePoint.x;
-	float by = attractivePoint.y;
-	float bz = attractivePoint.z;
+	float bx = barycenter.x;
+	float by = barycenter.y;
+	float bz = barycenter.z;
 
 	LOG_F(INFO, "Informations 2 (Drone cartesian): px: %f | py: %f | pz: %f", px, py, pz);
 	LOG_F(INFO, "Informations 3 (But) : bx: %f | by: %f | bz: %f", bx, by, bz);
 
-	bool isInRange = ((px > bx - RANGE && px < bx + RANGE) && (py > by - RANGE && py < by + RANGE) && (pz > bz - RANGE && pz < bz + RANGE));
-	bool onPoint = (px == bx) && (py == by) && (pz == bz);
+	infos.inRange = (px > bx - RANGE && px < bx + RANGE)
+		&& (py > by - RANGE && py < by + RANGE)
+		&& (pz > bz - RANGE && pz < bz + RANGE);
 
 	// On effectue une comparaison afin de savoir dans quelle direction on doit se diriger en x, y et z
-	if (isInRange)
+	if (infos.inRange)
 	{
 		// On alerte qu'on est entré dans la sphère d'arrivée, les ratios sont définies par défaut à 0
-		infos.inRange = true;
-		// LOG_F(INFO, "In range.");
+		bool onPoint = (px == bx) && (py == by) && (pz == bz);
 		if (onPoint)
 		{
 			infos.isArrived = true;
-			//LOG_F(INFO, "On point.");
 			return;
 		}
 	}
 
-	if (!infos.isArrived)
-	{
-		// LOG_F(INFO, "Not on the point yet.");
-		calculate_vector(droneCoordinates, attractivePoint, infos.vector.vx, infos.vector.vy, infos.vector.vz);
-		calculate_rotation(droneCoordinates.rotation, attractivePoint.rotation, infos.vector.vr);
+	infos.inRange = false;
+	infos.isArrived = false;
+	// LOG_F(INFO, "Not on the point yet.");
+	calculate_vector(droneCoordinates, barycenter, infos.vector.vx, infos.vector.vy, infos.vector.vz);
+	calculate_rotation(droneCoordinates.rotation, barycenter.rotation, infos.vector.vr);
 
-		//LOG_F(INFO, "Informations 4 (Translated vector): vx: %f | vy: %f | vz: %f | vr: %f", infos.vector.vx, infos.vector.vy, infos.vector.vz, infos.vector.vr);
+	//LOG_F(INFO, "Informations 4 (Translated vector): vx: %f | vy: %f | vz: %f | vr: %f", infos.vector.vx, infos.vector.vy, infos.vector.vz, infos.vector.vr);
 
-		if (px < bx)
-		{
-			// Ici faire en sorte que la donnée soit supérieure (entre ]0;1])
-			infos.ratioX = 1;
-		}
-		else
-		{
-			// Ici faire en sorte que la donnée soit supérieure (entre [-1;0[)
-			infos.ratioX = -1;
-		}
+	infos.ratioX = findRatio(px, bx);
+	infos.ratioY = findRatio(py, by);
+	infos.ratioZ = findRatio(pz, bz);
 
-		if (py < by)
-		{
-			infos.ratioY = 1;
-		}
-		else
-		{
-			infos.ratioY = -1;
-		}
-
-		if (pz < bz)
-		{
-			infos.ratioZ = 1;
-		}
-		else
-		{
-			infos.ratioZ = -1;
-		}
-
-		LOG_F(INFO, "Informations 5 (info struct): rx = %f | ry = %f | rz = %f | rr = %f | inRange = %d | isArrived = %d", infos.ratioX, infos.ratioY, infos.ratioZ, infos.ratioR, infos.inRange, infos.isArrived);
-	}
+	LOG_F(INFO, "Informations 5 (info struct): rx = %f | ry = %f | rz = %f | rr = %f | inRange = %d | isArrived = %d", infos.ratioX, infos.ratioY, infos.ratioZ, infos.ratioR, infos.inRange, infos.isArrived);
 }

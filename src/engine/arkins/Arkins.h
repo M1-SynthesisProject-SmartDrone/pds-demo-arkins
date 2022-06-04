@@ -19,7 +19,7 @@ using namespace std;
 
 #define EARTH_RADIUS 6371
 #define MATH_PI 3.141592
-#define RANGE 10000
+#define RANGE 1.0f
 #define UNITARY_VECTOR 0.5
 #define ATTRACTION_POINTS_SIZE 10
 #define REPULSION_RADIUS 100.0
@@ -39,6 +39,7 @@ public:
 		std::vector<Coordinates> tangentialPoints);
 
 	Informations& getInfos();
+	int countAttractionPoints();
 	std::vector<Coordinates>& getAttractionPoints();
 	std::vector<Coordinates>& getRepulsionPoints();
 	std::vector<Coordinates>& getTangentialPoints();

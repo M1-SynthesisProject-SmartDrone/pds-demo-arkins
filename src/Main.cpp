@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <chrono>
 
 #include <loguru/loguru.hpp>
 #include <SFML/Graphics.hpp>
@@ -59,6 +60,7 @@ int main(int argc, char *argv[])
         // Draw entities here
         
         renderer.renderGrid(window);
+        
         renderer.renderAttractivePoints(engine.getAttractivePoints(), window);
         renderer.renderRepulsivePoints(engine.getRepulsivePoints(), window, REPULSION_RADIUS);
         renderer.renderTangentialPoints(engine.getTangentialPoints(), window, 100.0);
@@ -67,8 +69,11 @@ int main(int argc, char *argv[])
         // Render drone at the end, so that it is on top of all others
         renderer.renderDrone(engine.getDroneCoordinates(), window);
 
+        // The pause button, among others (if any)
+        renderer.renderMisc(window, engine.isPaused());
+
         // End rendering
-        // As we defined framerate, we will have some sleeps calls after display
+        // As we have defined framerate, we will have some sleeps calls after display
         window.display();
     }
 

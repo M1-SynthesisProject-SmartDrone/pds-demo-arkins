@@ -24,10 +24,19 @@ Renderer::Renderer(ConfigImage imageConfig, ConfigWindow windowConfig, MapInfos 
     m_droneTexture = loadTexture(DRONE_IMAGE_NAME);
     m_droneSprite.setTexture(&m_droneTexture);
     // Size of the drone depends on the window size
-    float droneWidth = m_windowConfig.width * 0.07f;
-    float droneHeight = m_windowConfig.height * 0.07f;
+    float droneWidth = m_windowConfig.width * DRONE_SIZE_RATIO;
+    float droneHeight = m_windowConfig.height * DRONE_SIZE_RATIO;
     m_droneSprite.setSize(sf::Vector2f(droneWidth, droneHeight));
     m_droneSprite.setOrigin(sf::Vector2f(droneWidth / 2, droneHeight / 2));
+
+    // Pause icon
+    m_pauseTexture = loadTexture(PAUSE_IMAGE_NAME);
+    m_pauseSprite.setTexture(&m_pauseTexture);
+    // This is a square
+    float pauseWidth = m_windowConfig.width * PAUSE_SIZE_RATIO;
+    m_pauseSprite.setSize(sf::Vector2f(pauseWidth, pauseWidth));
+    // Position is fixed
+    m_pauseSprite.setPosition(0.0f, 0.0f);
 
     // Precalculation of any point radius
     m_pointRadius = min(m_windowConfig.width, m_windowConfig.height) * 0.025f;
@@ -65,6 +74,14 @@ void Renderer::renderGrid(sf::RenderWindow& window)
     lineX.setPosition(0.0f, (m_windowConfig.height / 2) - midGridThickness);
     window.draw(lineX);
     window.draw(lineY);
+}
+
+void Renderer::renderMisc(sf::RenderWindow& window, bool isPaused)
+{
+    if (isPaused)
+    {
+        window.draw(m_pauseSprite);
+    }
 }
 
 void Renderer::renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& window)
@@ -118,7 +135,6 @@ float Renderer::calculateXPos(float x)
 {
     auto& m = m_mapInfos;
     float distRatio = (x - m.minX) / m.width;
-    // return ((x / m.width) * m_windowConfig.width) + (distRatio * m_windowConfig.width);
     return (distRatio * m_windowConfig.width);
 }
 
@@ -126,7 +142,6 @@ float Renderer::calculateYPos(float y)
 {
     auto& m = m_mapInfos;
     float distRatio = (y - m.minY) / m.height;
-    // return ((y / m.height) * m_windowConfig.height) + (distRatio * m_windowConfig.height);
     return (distRatio * m_windowConfig.height);
 }
 

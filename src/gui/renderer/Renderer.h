@@ -15,6 +15,7 @@ class Renderer
 private:
     // ==== IMAGE FILENAMES ====
     static inline const std::string DRONE_IMAGE_NAME = "drone.png";
+    static inline const std::string PAUSE_IMAGE_NAME = "pause.png";
 
     // ==== COLORS ====
     static inline const sf::Color GRID_COLOR = sf::Color(105, 105, 105);;
@@ -31,8 +32,14 @@ private:
     const std::filesystem::path m_imageFolderPath;
 
     // This is kept as we load an image for this element
+    static inline constexpr float DRONE_SIZE_RATIO = 0.07f;
     sf::Texture m_droneTexture;
     sf::RectangleShape m_droneSprite;
+
+    // Pause icon
+    static inline constexpr float PAUSE_SIZE_RATIO = 0.05f;
+    sf::Texture m_pauseTexture;
+    sf::RectangleShape m_pauseSprite;
 
     // We don't want to calculate some values over and over
     float m_pointRadius;
@@ -69,6 +76,10 @@ public:
      * Draw a grid in on the window (for debugging puposes)
      */
     void renderGrid(sf::RenderWindow& window);
+    /**
+     * Draw little elements, such as pause icon
+     */
+    void renderMisc(sf::RenderWindow& window, bool isPaused);
     void renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& window);
     void renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window);
     void renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window, float effectRadius);

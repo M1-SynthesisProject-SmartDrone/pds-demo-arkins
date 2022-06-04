@@ -18,7 +18,29 @@ void Engine::update(Events& events)
         return;
     }
 
-    m_droneCoordinates.x += 1.0;
+    // If no attractive point remaining, we finished the simulation
+    if (m_arkins.countAttractionPoints() == 0)
+    {
+        m_isPaused = true;
+        return;
+    }
+
+    m_arkins.process(m_droneCoordinates);
+    Informations& movementInfos = m_arkins.getInfos();
+    
+    // Move the drone
+    m_droneCoordinates.x += movementInfos.ratioX * MOVEMENT_SPEED;
+    m_droneCoordinates.y += movementInfos.ratioY * MOVEMENT_SPEED;
+    m_droneCoordinates.z += movementInfos.ratioZ * MOVEMENT_SPEED;
+    m_droneCoordinates.rotation += movementInfos.ratioR * MOVEMENT_SPEED;
+
+    // handle point removal
+    if (movementInfos.inRange)
+    {
+        m_arkins.deleteAttractivePoint();
+    }
+
+    // TODO do a readme "how to create a map"
 }
 
 void Engine::handleEvents(Events& events)
@@ -43,7 +65,7 @@ void Engine::resetSimulation()
 // ==== GETTERS =====
 bool Engine::isPaused()
 {
-    return m_isPaused;   
+    return m_isPaused;
 }
 
 MapInfos Engine::getMapInfos()

@@ -8,6 +8,8 @@
 class Engine
 {
 private:
+    static constexpr float MOVEMENT_SPEED = 1.0f;
+
     const Map m_map;
     Coordinates m_droneCoordinates;
     Arkins m_arkins;
