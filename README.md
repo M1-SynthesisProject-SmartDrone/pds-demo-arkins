@@ -48,7 +48,7 @@ This is a single json file looking like this :
 }
 ```
 
-> The order of the points in all fields is not important, EXCEPT FOR "attractivePoints" (must be set in the path order).
+> The order of the points in all fields is not important.
 
 The simulation screen will adapt depending on the position of all points, don't worry about that !
 

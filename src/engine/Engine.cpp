@@ -37,7 +37,7 @@ void Engine::update(Events& events)
     // handle point removal
     if (movementInfos.inRange)
     {
-        m_arkins.deleteAttractivePoint();
+        m_arkins.deleteAttractivePoint(movementInfos.nearestPointIndex);
     }
 
     // TODO do a readme "how to create a map"

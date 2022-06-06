@@ -37,10 +37,32 @@ std::vector<Coordinates>& Arkins::getTangentialPoints()
 
 void Arkins::process(Coordinates& droneCoordinates)
 {
+	int minPointIdx = -1;
+	float minDistance = 99999.0f;
 	for (int attPoints = 0; attPoints < attractionPoints.size(); attPoints++)
 	{
-		calculate_dist_between_points(droneCoordinates, attractionPoints.at(attPoints));
+		auto& point = attractionPoints.at(attPoints);
+		calculate_dist_between_points(droneCoordinates, point);
+		if (point.distance_to_drone < minDistance)
+		{
+			minDistance = point.distance_to_drone;
+			minPointIdx = attPoints;
+		}
 	}
+	infos.nearestPointIndex = minPointIdx;
+
+	// Find if the nearest point is in range (i.e, to be deleted)
+	float px = droneCoordinates.x;
+	float py = droneCoordinates.y;
+	float pz = droneCoordinates.z;
+	auto& point = attractionPoints.at(minPointIdx);
+	float bx = point.x;
+	float by = point.y;
+	float bz = point.z;
+	infos.inRange = (px > bx - RANGE && px < bx + RANGE)
+		&& (py > by - RANGE && py < by + RANGE)
+		&& (pz > bz - RANGE && pz < bz + RANGE);
+	
 
 	Coordinates maxPoint = findMax(attractionPoints);
 
@@ -52,6 +74,11 @@ void Arkins::process(Coordinates& droneCoordinates)
 void Arkins::deleteAttractivePoint()
 {
 	attractionPoints.erase(attractionPoints.begin());
+}
+
+void Arkins::deleteAttractivePoint(int index)
+{
+	attractionPoints.erase(attractionPoints.begin() + index);
 }
 
 void Arkins::resetAttractivePoints(std::vector<Coordinates> attractionPoints)
@@ -179,9 +206,10 @@ void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos
 	LOG_F(INFO, "Informations 2 (Drone cartesian): px: %f | py: %f | pz: %f", px, py, pz);
 	LOG_F(INFO, "Informations 3 (But) : bx: %f | by: %f | bz: %f", bx, by, bz);
 
-	infos.inRange = (px > bx - RANGE && px < bx + RANGE)
+	/*infos.inRange = (px > bx - RANGE && px < bx + RANGE)
 		&& (py > by - RANGE && py < by + RANGE)
 		&& (pz > bz - RANGE && pz < bz + RANGE);
+	
 
 	// On effectue une comparaison afin de savoir dans quelle direction on doit se diriger en x, y et z
 	if (infos.inRange)
@@ -194,9 +222,8 @@ void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos
 			return;
 		}
 	}
+	*/
 
-	infos.inRange = false;
-	infos.isArrived = false;
 	// LOG_F(INFO, "Not on the point yet.");
 	calculate_vector(droneCoordinates, barycenter, infos.vector.vx, infos.vector.vy, infos.vector.vz);
 	calculate_rotation(droneCoordinates.rotation, barycenter.rotation, infos.vector.vr);

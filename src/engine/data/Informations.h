@@ -12,6 +12,7 @@ struct Informations
 	bool inRange;
 	bool isArrived;
 	Vector vector;
+	int nearestPointIndex;
 
 	Informations();
 	Informations(float ratioX, float ratioY, float ratioZ, float ratioR);

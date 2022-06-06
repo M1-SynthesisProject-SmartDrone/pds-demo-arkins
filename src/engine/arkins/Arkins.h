@@ -19,7 +19,7 @@ using namespace std;
 
 #define EARTH_RADIUS 6371
 #define MATH_PI 3.141592
-#define RANGE 1.0f
+#define RANGE 50.0f
 #define UNITARY_VECTOR 0.5
 #define ATTRACTION_POINTS_SIZE 10
 #define REPULSION_RADIUS 100.0
@@ -46,6 +46,7 @@ public:
 
 	void process(Coordinates& droneCoordinates); // Process all the environment to calculate the vector to follow
 	void deleteAttractivePoint(); // Delete an attractive point from the list [useful after visiting one of the points]
+	void deleteAttractivePoint(int index);
 	void resetAttractivePoints(std::vector<Coordinates> attractionPoints); // Reset all the attractive points [useful after visiting every points]
 
 private:
