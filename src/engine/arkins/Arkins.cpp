@@ -37,6 +37,8 @@ std::vector<Coordinates>& Arkins::getTangentialPoints()
 
 void Arkins::process(Coordinates& droneCoordinates)
 {
+	auto start = chrono::steady_clock::now();
+
 	int minPointIdx = -1;
 	float minDistance = 99999.0f;
 	for (int attPoints = 0; attPoints < attractionPoints.size(); attPoints++)
@@ -51,24 +53,41 @@ void Arkins::process(Coordinates& droneCoordinates)
 	}
 	infos.nearestPointIndex = minPointIdx;
 
-	// Find if the nearest point is in range (i.e, to be deleted)
-	float px = droneCoordinates.x;
-	float py = droneCoordinates.y;
-	float pz = droneCoordinates.z;
 	auto& point = attractionPoints.at(minPointIdx);
-	float bx = point.x;
-	float by = point.y;
-	float bz = point.z;
-	infos.inRange = (px > bx - RANGE && px < bx + RANGE)
-		&& (py > by - RANGE && py < by + RANGE)
-		&& (pz > bz - RANGE && pz < bz + RANGE);
-	
+	infos.inRange = isInAttractiveRange(droneCoordinates, point);
 
 	Coordinates maxPoint = findMax(attractionPoints);
 
 	calculate_coefficient_attraction(attractionPoints, maxPoint.distance_to_drone);
-	Coordinates barycenter = calculate_barycenter(attractionPoints);
+	Coordinates barycenter = calculate_barycenter(attractionPoints, infos);
 	calculate_ratios(droneCoordinates, infos, barycenter);
+	auto end = chrono::steady_clock::now();
+
+	for(Coordinates& repulsivePoint: repulsionPoints){
+		calculate_dist_between_points(droneCoordinates, repulsivePoint);
+		LOG_F(ERROR, "Distance between r et d: %f | RANGE = %f", repulsivePoint.distance_to_drone, REPULSION_RADIUS);
+		if(isInRepulsionRadius(droneCoordinates, repulsivePoint)){
+			LOG_F(ERROR, "IS IN REPUSLIVE POINT !!!");
+			repulsion(droneCoordinates, barycenter, repulsivePoint, infos);
+		}
+	}
+
+	LOG_F(WARNING, "ELAPSED TIME FOR PROCESSING : %ld µs", chrono::duration_cast<chrono::microseconds>(end-start).count());
+}
+
+bool Arkins::isInAttractiveRange(Coordinates& droneCoordinates, Coordinates& attractivePoint){
+	// Find if the nearest point is in range (i.e, to be deleted)
+	float px = droneCoordinates.x;
+	float py = droneCoordinates.y;
+	float pz = droneCoordinates.z;
+
+	float bx = attractivePoint.x;
+	float by = attractivePoint.y;
+	float bz = attractivePoint.z;
+
+	return (px > bx - RANGE && px < bx + RANGE)
+		&& (py > by - RANGE && py < by + RANGE)
+		&& (pz > bz - RANGE && pz < bz + RANGE);
 }
 
 void Arkins::deleteAttractivePoint()
@@ -102,25 +121,29 @@ Coordinates Arkins::findMax(std::vector<Coordinates>& vector)
 	return maxPoint;
 }
 
-Coordinates Arkins::calculate_barycenter(std::vector<Coordinates>& vector)
+Coordinates Arkins::calculate_barycenter(std::vector<Coordinates>& vector, Informations& infos)
 {
 	Coordinates barycenter;
 	float sum_x = 0;
 	float sum_y = 0;
 	float sum_z = 0;
 	float sum_coef = 0;
+	int index = 0;
 	for (const auto& point : vector)
 	{
+		LOG_F(WARNING, "ATTRACTION n°%d : x:%f y:%f z:%f",index, point.x, point.y, point.z);
 		sum_x += point.attraction * point.x;
 		sum_y += point.attraction * point.y;
 		sum_z += point.attraction * point.z;
 		sum_coef += point.attraction;
+		index = index + 1;
 	}
-	LOG_F(INFO, "zqduqbz (But) : px: %f | py: %f | pz: %f | coef : %f", sum_x, sum_y, sum_z, sum_coef);
+	LOG_F(INFO, "Informations (But) : px: %f | py: %f | pz: %f | coef : %f", sum_x, sum_y, sum_z, sum_coef);
 	barycenter.x = sum_x / sum_coef;
 	barycenter.y = sum_y / sum_coef;
 	barycenter.z = sum_z / sum_coef;
-	barycenter.attraction = 1;
+	infos.barycenter = barycenter;
+
 	return barycenter;
 }
 
@@ -140,30 +163,11 @@ void Arkins::calculate_coefficient_attraction(std::vector<Coordinates>& vector, 
 	{
 		for (auto& coordinate : vector)
 		{
-			float coef = 1.0f - coordinate.distance_to_drone / maxDistance;
+			float coef = exp(exp(exp(1.0f - coordinate.distance_to_drone / maxDistance)));
 			// + on est proche du point d'attraction, + le coefficient sera grand [d'où le 1 - rapport distance/maxDistance]
 			coordinate.attraction = coef;
 		}
 	}
-}
-
-void Arkins::calculate_vector(Coordinates& droneCoordinates, Coordinates& targetCoordinates, float& x, float& y, float& z)
-{
-	x = droneCoordinates.x - targetCoordinates.x;
-	y = droneCoordinates.y - targetCoordinates.y;
-	z = droneCoordinates.z - droneCoordinates.z;
-}
-
-bool Arkins::isInRepulsionRadius(Coordinates& droneCoordinates, Coordinates& repulsionPoint)
-{
-	if (droneCoordinates.x <= repulsionPoint.x + REPULSION_RADIUS && droneCoordinates.x >= repulsionPoint.x - REPULSION_RADIUS)
-	{
-		if (droneCoordinates.y <= repulsionPoint.y + REPULSION_RADIUS && droneCoordinates.z >= repulsionPoint.z - REPULSION_RADIUS)
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 void Arkins::calculate_rotation(float hdg, float targeted_hdg, float& r)
@@ -206,25 +210,6 @@ void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos
 	LOG_F(INFO, "Informations 2 (Drone cartesian): px: %f | py: %f | pz: %f", px, py, pz);
 	LOG_F(INFO, "Informations 3 (But) : bx: %f | by: %f | bz: %f", bx, by, bz);
 
-	/*infos.inRange = (px > bx - RANGE && px < bx + RANGE)
-		&& (py > by - RANGE && py < by + RANGE)
-		&& (pz > bz - RANGE && pz < bz + RANGE);
-	
-
-	// On effectue une comparaison afin de savoir dans quelle direction on doit se diriger en x, y et z
-	if (infos.inRange)
-	{
-		// On alerte qu'on est entré dans la sphère d'arrivée, les ratios sont définies par défaut à 0
-		bool onPoint = (px == bx) && (py == by) && (pz == bz);
-		if (onPoint)
-		{
-			infos.isArrived = true;
-			return;
-		}
-	}
-	*/
-
-	// LOG_F(INFO, "Not on the point yet.");
 	calculate_vector(droneCoordinates, barycenter, infos.vector.vx, infos.vector.vy, infos.vector.vz);
 	calculate_rotation(droneCoordinates.rotation, barycenter.rotation, infos.vector.vr);
 
@@ -235,4 +220,46 @@ void Arkins::calculate_ratios(Coordinates& droneCoordinates, Informations& infos
 	infos.ratioZ = findRatio(pz, bz);
 
 	LOG_F(INFO, "Informations 5 (info struct): rx = %f | ry = %f | rz = %f | rr = %f | inRange = %d | isArrived = %d", infos.ratioX, infos.ratioY, infos.ratioZ, infos.ratioR, infos.inRange, infos.isArrived);
+}
+
+bool Arkins::isInRepulsionRadius(Coordinates& droneCoordinates, Coordinates& repulsionPoint)
+{
+	return repulsionPoint.distance_to_drone <= REPULSION_RADIUS;
+}
+
+void Arkins::calculate_vector(Coordinates& droneCoordinates, Coordinates& targetCoordinates, float& x, float& y, float& z)
+{
+	x = droneCoordinates.x - targetCoordinates.x;
+	y = droneCoordinates.y - targetCoordinates.y;
+	z = droneCoordinates.z - droneCoordinates.z;
+}
+
+void Arkins::calculate_vector(Coordinates& droneCoordinates, Coordinates& targetCoordinates, Vector &vector)
+{
+	vector.vx = droneCoordinates.x - targetCoordinates.x;
+	vector.vy = droneCoordinates.y - targetCoordinates.y;
+	vector.vz = droneCoordinates.z - droneCoordinates.z;
+}
+
+void Arkins::calculate_vector(Vector& vect1, Vector& vect2, Vector &vector)
+{
+	vector.vx = vect1.vx + vect2.vx;
+	vector.vy = vect1.vy + vect2.vy;
+	vector.vz = vect1.vz + vect2.vz;
+	LOG_F(ERROR, "VECTEUR INSIDE : %f %f %f", vector.vx, vector.vy, vector.vy);
+}
+
+void Arkins::repulsion(Coordinates& droneCoordinates, Coordinates& barycenter, Coordinates& repulsivePoint, Informations &infos){
+	Vector rd;
+	Vector db;
+	Vector g;
+	calculate_vector(droneCoordinates, repulsivePoint, rd);
+	calculate_vector(barycenter, droneCoordinates, db);
+	calculate_vector(rd, db, g);
+	infos.vector = g;
+	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + g.vx);
+	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + g.vy);
+	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + g.vz);
+	LOG_F(ERROR, " rdvx:%f rdvy:%f rdvz:%f | dbvx:%f dbvy:%f dbvz:%f| gvx:%f gvy:%f gvz:%f | irx:%f iry:%f irz:%f ", 
+			rd.vx, rd.vy, rd.vz, db.vx, db.vy, db.vz, g.vx, g.vy, g.vz, infos.ratioX, infos.ratioY, infos.ratioZ);
 }

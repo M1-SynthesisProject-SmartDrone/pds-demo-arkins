@@ -20,6 +20,7 @@ private:
     // ==== COLORS ====
     static inline const sf::Color GRID_COLOR = sf::Color(105, 105, 105);;
     static inline const sf::Color ATTRACTIVE_POINT_COLOR = sf::Color::Blue;
+    static inline const sf::Color BARYCENTER_POINT_COLOR = sf::Color::Green;
     static inline const sf::Color REPULSIVE_POINT_COLOR = sf::Color::Red;
     static inline const sf::Color TANGENTIAL_POINT_COLOR = sf::Color(255, 127, 80); // Orange
 
@@ -80,8 +81,9 @@ public:
      * Draw little elements, such as pause icon
      */
     void renderMisc(sf::RenderWindow& window, bool isPaused);
+    void renderbarycenter(Coordinates& barycenter, sf::RenderWindow& window);
     void renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& window);
-    void renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window);
+    void renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window, float radius);
     void renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window, float effectRadius);
     void renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window, float effectRadius);
     // TODO : uniform field

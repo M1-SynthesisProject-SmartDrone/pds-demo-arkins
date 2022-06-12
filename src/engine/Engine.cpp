@@ -73,6 +73,11 @@ MapInfos Engine::getMapInfos()
     return m_map.infos;
 }
 
+Coordinates& Engine::getBarycenter()
+{
+    return m_arkins.getInfos().barycenter;
+}
+
 Coordinates& Engine::getDroneCoordinates()
 {
     return m_droneCoordinates;

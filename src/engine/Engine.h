@@ -29,6 +29,7 @@ public:
     // ==== GETTERS ====
     bool isPaused();
     MapInfos getMapInfos();
+    Coordinates& getBarycenter();
     Coordinates& getDroneCoordinates();
     vector<Coordinates>& getAttractivePoints();
     vector<Coordinates>& getRepulsivePoints();

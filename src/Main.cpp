@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
         // Draw entities here
         
         renderer.renderGrid(window);
-        
-        renderer.renderAttractivePoints(engine.getAttractivePoints(), window);
+        renderer.renderbarycenter(engine.getBarycenter(), window);
+        renderer.renderAttractivePoints(engine.getAttractivePoints(), window, RANGE);
         renderer.renderRepulsivePoints(engine.getRepulsivePoints(), window, REPULSION_RADIUS);
         renderer.renderTangentialPoints(engine.getTangentialPoints(), window, 100.0);
         // TODO call render uniform fields

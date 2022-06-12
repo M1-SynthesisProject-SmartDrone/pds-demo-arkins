@@ -91,13 +91,24 @@ void Renderer::renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& wind
     window.draw(m_droneSprite);
 }
 
-void Renderer::renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window)
+void Renderer::renderbarycenter(Coordinates& barycenter, sf::RenderWindow& window)
+{
+    auto point = createCircle(m_pointRadius, BARYCENTER_POINT_COLOR);
+    point.setPosition(calculatePos(barycenter));
+    window.draw(point);
+}
+
+void Renderer::renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window, float radius)
 {
     auto point = createCircle(m_pointRadius, ATTRACTIVE_POINT_COLOR);
+    auto range = createCircle(radius, ATTRACTIVE_POINT_COLOR, true);
     for (const auto& c : attractivePoints)
     {
-        point.setPosition(calculatePos(c));
+        auto pos = calculatePos(c);
+        point.setPosition(pos);
+        range.setPosition(pos);
         window.draw(point);
+        window.draw(range);
     }
 }
 
