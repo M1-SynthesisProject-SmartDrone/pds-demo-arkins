@@ -24,7 +24,7 @@ struct Map
     std::vector<Coordinates> attractivePoints;
     std::vector<Coordinates> repulsivePoints;
     std::vector<Coordinates> tangentialPoints;
-    // TODO uniform fields
+    std::vector<Coordinates> uniformFields;
 };
 
 #endif // __MAP_H__

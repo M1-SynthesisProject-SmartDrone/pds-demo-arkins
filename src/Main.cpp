@@ -60,11 +60,12 @@ int main(int argc, char *argv[])
         // Draw entities here
         
         renderer.renderGrid(window);
-        renderer.renderbarycenter(engine.getBarycenter(), window);
         renderer.renderAttractivePoints(engine.getAttractivePoints(), window, RANGE);
         renderer.renderRepulsivePoints(engine.getRepulsivePoints(), window, REPULSION_RADIUS);
         renderer.renderTangentialPoints(engine.getTangentialPoints(), window, 100.0);
-        // TODO call render uniform fields
+        renderer.renderUniformFields(engine.getUniformFields(), window, UNIFORM_WIDTH, UNIFORM_HEIGHT);
+
+        renderer.renderbarycenter(engine.getBarycenter(), window);
 
         // Render drone at the end, so that it is on top of all others
         renderer.renderDrone(engine.getDroneCoordinates(), window);

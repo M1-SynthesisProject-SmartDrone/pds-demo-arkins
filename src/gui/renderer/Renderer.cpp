@@ -127,6 +127,16 @@ void Renderer::renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, 
     }
 }
 
+void Renderer::renderUniformFields(std::vector<Coordinates>& uniformFields, sf::RenderWindow& window, float width, float height)
+{
+    auto rectangle = createRectangle(width, height, UNIFORM_FIELD_COLOR);
+    for(const auto& field : uniformFields)
+    {
+        rectangle.setPosition(field.x, field.y);
+        window.draw(rectangle);
+    }
+}
+
 void Renderer::renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window, float effectRadius)
 {
     auto point = createCircle(m_pointRadius, TANGENTIAL_POINT_COLOR);
@@ -186,4 +196,13 @@ sf::CircleShape Renderer::createCircle(float radius, const sf::Color& color, boo
     }
     circle.setOrigin(displayedRadius, displayedRadius);
     return circle;
+}
+
+sf::RectangleShape Renderer::createRectangle(float width, float height, const sf::Color& color)
+{
+    sf::RectangleShape rectangle(sf::Vector2f(width, height));
+    rectangle.setOutlineColor(color);
+    rectangle.setOutlineThickness(2.0f);
+    rectangle.setOrigin(sf::Vector2f(width / 2, height / 2));
+    return rectangle;
 }

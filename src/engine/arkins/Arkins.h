@@ -46,7 +46,7 @@ public:
 	std::vector<Coordinates>& getAttractionPoints();
 	std::vector<Coordinates>& getRepulsionPoints();
 	std::vector<Coordinates>& getTangentialPoints();
-	std::vector>Coordinates>& getUniformPoints();
+	std::vector<Coordinates>& getUniformPoints();
 
 	void process(Coordinates& droneCoordinates); // Process all the environment to calculate the vector to follow
 	void deleteAttractivePoint(); // Delete an attractive point from the list [useful after visiting one of the points]
@@ -63,6 +63,7 @@ private:
 
 	bool isInRepulsionRadius(Coordinates& droneCoordinates, Coordinates& repulsionPoint); // Check if the drone is within the repulsion radius of given point
 	bool isInAttractiveRange(Coordinates& droneCoordinates, Coordinates& attractivePoint);
+	bool isInUniformRadius(Coordinates& droneCoordinates, Coordinates& uniformRadius);
 	void calculate_dist_between_points(Coordinates& droneCoordinates, Coordinates& attractionPoint); // Calculate the distance between two points
 	void calculate_coefficient_attraction(std::vector<Coordinates>& vector, float maxDistance); // Calculate the attraction coefficient from a list of attractive points
 	void calculate_ratios(Coordinates& droneCoordinates, Informations& infos, Coordinates& attractivePoint); // Calculate the ratios and filling the structure to return

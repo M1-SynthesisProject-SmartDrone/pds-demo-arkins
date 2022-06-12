@@ -3,7 +3,7 @@
 Engine::Engine(ConfigMap mapConfig) :
     m_map(mapConfig),
     m_droneCoordinates(m_map.droneCoordinates),
-    m_arkins(m_map.attractivePoints, m_map.repulsivePoints, m_map.tangentialPoints)
+    m_arkins(m_map.attractivePoints, m_map.repulsivePoints, m_map.tangentialPoints, m_map.uniformFields)
 {}
 
 Engine::~Engine()
@@ -39,8 +39,6 @@ void Engine::update(Events& events)
     {
         m_arkins.deleteAttractivePoint(movementInfos.nearestPointIndex);
     }
-
-    // TODO do a readme "how to create a map"
 }
 
 void Engine::handleEvents(Events& events)
@@ -96,4 +94,9 @@ vector<Coordinates>& Engine::getRepulsivePoints()
 vector<Coordinates>& Engine::getTangentialPoints()
 {
     return m_arkins.getTangentialPoints();
+}
+
+vector<Coordinates>& Engine::getUniformFields()
+{
+    return m_arkins.getUniformPoints();
 }

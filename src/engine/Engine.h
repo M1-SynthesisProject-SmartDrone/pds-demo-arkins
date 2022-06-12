@@ -34,7 +34,7 @@ public:
     vector<Coordinates>& getAttractivePoints();
     vector<Coordinates>& getRepulsivePoints();
     vector<Coordinates>& getTangentialPoints();
-    // TODO uniform
+    vector<Coordinates>& getUniformFields();
 };
 
 #endif // __ENGINE_H__

@@ -27,7 +27,7 @@ Map::Map(ConfigMap mapConfig)
     attractivePoints = findPoints(json, "attractivePoints");
     repulsivePoints = findPoints(json, "repulsivePoints");
     tangentialPoints = findPoints(json, "tangentialPoints");
-    // TODO uniform
+    uniformFields = findPoints(json, "uniformFields");
 
     LOG_F(INFO, "Create map infos");
     // Create map infos
@@ -40,7 +40,7 @@ Map::Map(ConfigMap mapConfig)
     updateBoundaries(attractivePoints, infos);
     updateBoundaries(repulsivePoints, infos);
     updateBoundaries(tangentialPoints, infos);
-    // TODO uniform
+    updateBoundaries(uniformFields, infos);
     
     // Add space arround
     infos.minX -= mapConfig.spaceArround;

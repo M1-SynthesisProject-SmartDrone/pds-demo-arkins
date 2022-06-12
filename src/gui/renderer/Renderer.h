@@ -23,6 +23,7 @@ private:
     static inline const sf::Color BARYCENTER_POINT_COLOR = sf::Color::Green;
     static inline const sf::Color REPULSIVE_POINT_COLOR = sf::Color::Red;
     static inline const sf::Color TANGENTIAL_POINT_COLOR = sf::Color(255, 127, 80); // Orange
+    static inline const sf::Color UNIFORM_FIELD_COLOR = sf::Color(212, 19, 209); // Purple
 
     // ==== SIZES ====
     static inline const float GRID_THICKNESS = 2.0f;
@@ -66,6 +67,11 @@ private:
      */
     sf::CircleShape createCircle(float radius, const sf::Color& color, bool colorOutline = false);
 
+    /**
+     * Create a rectangle with the origin at the center.
+     */
+    sf::RectangleShape createRectangle(float width, float height, const sf::Color& color);
+
 public:
     /**
      * This will check if the config is valid (correct image folder path, etc.)
@@ -86,7 +92,7 @@ public:
     void renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window, float radius);
     void renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window, float effectRadius);
     void renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window, float effectRadius);
-    // TODO : uniform field
+    void renderUniformFields(std::vector<Coordinates>& uniformFields, sf::RenderWindow& window, float width, float height);
 };
 
 #endif // __RENDERER_H__
