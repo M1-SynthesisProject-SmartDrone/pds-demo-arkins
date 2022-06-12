@@ -6,8 +6,8 @@ Arkins::Arkins()
 }
 
 Arkins::Arkins(std::vector<Coordinates> attractionPoints, std::vector<Coordinates> repulsionPoints,
-	std::vector<Coordinates> tangentialPoints) : attractionPoints(attractionPoints),
-	repulsionPoints(repulsionPoints), tangentialPoints(tangentialPoints)
+	std::vector<Coordinates> tangentialPoints, std::vector<Coordinates> uniformPoints) : attractionPoints(attractionPoints),
+	repulsionPoints(repulsionPoints), tangentialPoints(tangentialPoints), uniformPoints(uniformPoints)
 {}
 
 Informations& Arkins::getInfos()
@@ -35,9 +35,26 @@ std::vector<Coordinates>& Arkins::getTangentialPoints()
 	return tangentialPoints;
 }
 
+std::vector<Coordinates>& Arkins::getUniformPoints(){
+	return uniformPoints;
+}
 void Arkins::process(Coordinates& droneCoordinates)
 {
 	auto start = chrono::steady_clock::now();
+	bool isInRepulsivePoint = false;
+	bool isInUniformPoint = false;
+	for(Coordinates& repulsivePoint: repulsionPoints){
+		calculate_dist_between_points(droneCoordinates, repulsivePoint);
+		if(isInRepulsionRadius(droneCoordinates, repulsivePoint)){
+			isInRepulsivePoint = true;
+		}
+	}
+
+	for(Coordinates& uniformPoint: uniformPoints){
+		if(isInUniformRadius(droneCoordinates, uniformPoint)){
+			isInUniformPoint = true;
+		}
+	}
 
 	int minPointIdx = -1;
 	float minDistance = 99999.0f;
@@ -60,17 +77,25 @@ void Arkins::process(Coordinates& droneCoordinates)
 
 	calculate_coefficient_attraction(attractionPoints, maxPoint.distance_to_drone);
 	Coordinates barycenter = calculate_barycenter(attractionPoints, infos);
-	calculate_ratios(droneCoordinates, infos, barycenter);
-	auto end = chrono::steady_clock::now();
 
-	for(Coordinates& repulsivePoint: repulsionPoints){
-		calculate_dist_between_points(droneCoordinates, repulsivePoint);
-		LOG_F(ERROR, "Distance between r et d: %f | RANGE = %f", repulsivePoint.distance_to_drone, REPULSION_RADIUS);
-		if(isInRepulsionRadius(droneCoordinates, repulsivePoint)){
-			LOG_F(ERROR, "IS IN REPUSLIVE POINT !!!");
-			repulsion(droneCoordinates, barycenter, repulsivePoint, infos);
+	if(isInRepulsivePoint){
+		for(Coordinates& repulsivePoint: repulsionPoints){
+			LOG_F(ERROR, "Distance between r et d: %f | RANGE = %f", repulsivePoint.distance_to_drone, REPULSION_RADIUS);
+			if(isInRepulsionRadius(droneCoordinates, repulsivePoint)){
+				repulsion(droneCoordinates, barycenter, repulsivePoint, infos);
+			}
 		}
 	}
+	else if(isInUniformPoint){
+		for(Coordinates& uniformPoint: uniformPoints){
+			uniform(droneCoordinates, uniformPoint, barycenter, infos);
+		}
+	}
+	else{
+		calculate_ratios(droneCoordinates, infos, barycenter);
+	}
+	
+	auto end = chrono::steady_clock::now();
 
 	LOG_F(WARNING, "ELAPSED TIME FOR PROCESSING : %ld µs", chrono::duration_cast<chrono::microseconds>(end-start).count());
 }
@@ -227,6 +252,11 @@ bool Arkins::isInRepulsionRadius(Coordinates& droneCoordinates, Coordinates& rep
 	return repulsionPoint.distance_to_drone <= REPULSION_RADIUS;
 }
 
+bool Arkins::isInUniformRadius(Coordinates& droneCoordinates, Coordinates& uniformRadius){
+	return (droneCoordinates.x > uniformRadius.x && droneCoordinates.x <= uniformRadius.x + UNIFORM_WIDTH)
+			&& (droneCoordinates.y > uniformRadius.y && droneCoordinates.y <= uniformRadius.y + UNIFORM_HEIGHT);
+}
+
 void Arkins::calculate_vector(Coordinates& droneCoordinates, Coordinates& targetCoordinates, float& x, float& y, float& z)
 {
 	x = droneCoordinates.x - targetCoordinates.x;
@@ -262,4 +292,17 @@ void Arkins::repulsion(Coordinates& droneCoordinates, Coordinates& barycenter, C
 	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + g.vz);
 	LOG_F(ERROR, " rdvx:%f rdvy:%f rdvz:%f | dbvx:%f dbvy:%f dbvz:%f| gvx:%f gvy:%f gvz:%f | irx:%f iry:%f irz:%f ", 
 			rd.vx, rd.vy, rd.vz, db.vx, db.vy, db.vz, g.vx, g.vy, g.vz, infos.ratioX, infos.ratioY, infos.ratioZ);
+}
+
+void Arkins::uniform(Coordinates& droneCoordinates, Coordinates& uniformPoint, Coordinates& goalPoint, Informations &infos){
+	Vector ud;
+	Vector db;
+	Vector g;
+	calculate_vector(uniformPoint, droneCoordinates, ud);
+	calculate_vector(goalPoint, droneCoordinates, db);
+	calculate_vector(ud, db, g);
+	infos.vector = g;
+	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + g.vx);
+	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + g.vy);
+	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + g.vz);
 }

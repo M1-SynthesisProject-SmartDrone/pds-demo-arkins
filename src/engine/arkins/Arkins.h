@@ -23,6 +23,8 @@ using namespace std;
 #define UNITARY_VECTOR 0.5
 #define ATTRACTION_POINTS_SIZE 10
 #define REPULSION_RADIUS 130.0
+#define UNIFORM_HEIGHT 150
+#define UNIFORM_WIDTH 100
 
 class Arkins
 {
@@ -30,25 +32,29 @@ private:
 	std::vector<Coordinates> attractionPoints;
 	std::vector<Coordinates> repulsionPoints;
 	std::vector<Coordinates> tangentialPoints;
+	std::vector<Coordinates> uniformPoints;
 	Informations infos;
 
 
 public:
 	Arkins();
 	Arkins(std::vector<Coordinates> attractionPoints, std::vector<Coordinates> repulsionPoints,
-		std::vector<Coordinates> tangentialPoints);
+		std::vector<Coordinates> tangentialPoints, std::vector<Coordinates> uniformPoints);
 
 	Informations& getInfos();
 	int countAttractionPoints();
 	std::vector<Coordinates>& getAttractionPoints();
 	std::vector<Coordinates>& getRepulsionPoints();
 	std::vector<Coordinates>& getTangentialPoints();
+	std::vector>Coordinates>& getUniformPoints();
 
 	void process(Coordinates& droneCoordinates); // Process all the environment to calculate the vector to follow
 	void deleteAttractivePoint(); // Delete an attractive point from the list [useful after visiting one of the points]
 	void deleteAttractivePoint(int index);
 	void resetAttractivePoints(std::vector<Coordinates> attractionPoints); // Reset all the attractive points [useful after visiting every points]
 	void repulsion(Coordinates& droneCoordinates, Coordinates& barycenter, Coordinates& repulsivePoint, Informations &infos);
+	void uniform(Coordinates& droneCoordinates, Coordinates& uniformPoint, Coordinates& goalPoint, Informations &infos);
+
 private:
 	void calculate_rotation(float hdg, float targeted_hdg, float& r); // Calculate how much rotation to do from a rotation to another
 	void calculate_vector(Coordinates& droneCoordinates, Coordinates& targetCoordinates, float& x, float& y, float& z); // Calculate the vector between two positions
