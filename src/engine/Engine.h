@@ -21,7 +21,7 @@ private:
     void resetSimulation();
 
 public:
-    Engine(ConfigMap mapConfig);
+    Engine(ConfigMap mapConfig, ConfigWindow windowConfig);
     ~Engine();
 
     void update(Events& events);

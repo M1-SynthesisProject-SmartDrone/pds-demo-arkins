@@ -182,19 +182,21 @@ float Renderer::calculateRadius(float r)
 
 sf::CircleShape Renderer::createCircle(float radius, const sf::Color& color, bool colorOutline)
 {
-    float displayedRadius = calculateRadius(radius);
-    sf::CircleShape circle(displayedRadius);
+    // float displayedRadius = calculateRadius(radius);
+    sf::CircleShape circle(radius);
+    circle.setOrigin(radius, radius);
     if (colorOutline)
     {
+        circle.setScale(sf::Vector2f(m_windowConfig.width / m_mapInfos.width, m_windowConfig.height / m_mapInfos.height));
         circle.setFillColor(sf::Color::Transparent);
         circle.setOutlineColor(color);
-        circle.setOutlineThickness(1.0f);
+        circle.setOutlineThickness(CIRCLE_THICKNESS);
     }
     else
     {
+        circle.setScale(sf::Vector2f(m_windowConfig.width / m_mapInfos.width, m_windowConfig.width / m_mapInfos.width));
         circle.setFillColor(color);
     }
-    circle.setOrigin(displayedRadius, displayedRadius);
     return circle;
 }
 
@@ -202,7 +204,7 @@ sf::RectangleShape Renderer::createRectangle(float width, float height, const sf
 {
     sf::RectangleShape rectangle(sf::Vector2f(width, height));
     rectangle.setOutlineColor(color);
-    rectangle.setOutlineThickness(2.0f);
+    rectangle.setOutlineThickness(UNIFORM_THICKNESS);
     rectangle.setOrigin(sf::Vector2f(width / 2, height / 2));
     return rectangle;
 }

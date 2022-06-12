@@ -18,7 +18,7 @@ vector<Coordinates> findPoints(const nlohmann::json& json, const char* fieldName
 void updateBoundaries(const Coordinates& coordinates, MapInfos& infos);
 void updateBoundaries(const vector<Coordinates>& points, MapInfos& infos);
 
-Map::Map(ConfigMap mapConfig)
+Map::Map(ConfigMap mapConfig, ConfigWindow windowConfig)
 {
     LOG_F(INFO, "Load json file %s", mapConfig.filename.c_str());
     auto json = loadJson(mapConfig.filename);
@@ -41,7 +41,7 @@ Map::Map(ConfigMap mapConfig)
     updateBoundaries(repulsivePoints, infos);
     updateBoundaries(tangentialPoints, infos);
     updateBoundaries(uniformFields, infos);
-    
+
     // Add space arround
     infos.minX -= mapConfig.spaceArround;
     infos.maxX += mapConfig.spaceArround;
@@ -50,6 +50,32 @@ Map::Map(ConfigMap mapConfig)
 
     infos.width = infos.maxX - infos.minX;
     infos.height = infos.maxY - infos.minY;
+
+    printf("Map width : %f, map height : %f\n", infos.width, infos.height);
+
+    // We want to have the same ratio as the window we will display on
+    float mapRatio = infos.width / infos.height;
+    float windowRatio = (float) windowConfig.width / (float) windowConfig.height;
+    printf("Map ratio : %f, Window ratio : %f\n", mapRatio, windowRatio);
+    if (mapRatio > windowRatio)
+    {
+        // map height is not big enough
+        float newMapHeight = infos.width / windowRatio;
+        float offset = (newMapHeight - infos.height) / 2;
+        infos.minY -= offset;
+        infos.maxY += offset;
+        infos.height = newMapHeight;
+    }
+    else if (mapRatio < windowRatio)
+    {
+        // map width is not big enough
+        float newMapWidth = infos.height * windowRatio;
+        float offset = (newMapWidth - infos.width) / 2;
+        infos.minX -= offset;
+        infos.maxX += offset;
+        infos.width = newMapWidth;
+    }
+    printf("Map width : %f, map height : %f\n", infos.width, infos.height);
 }
 
 Map::~Map()
@@ -57,10 +83,10 @@ Map::~Map()
 
 nlohmann::json loadJson(const std::string& filename)
 {
-    if(!fs::exists(filename))
+    if (!fs::exists(filename))
     {
         stringstream ss;
-        ss << "The file \"" << filename <<"\" does not exists";
+        ss << "The file \"" << filename << "\" does not exists";
         throw runtime_error(ss.str());
     }
     ifstream inputStream(filename);

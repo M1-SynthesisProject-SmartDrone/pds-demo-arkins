@@ -15,7 +15,7 @@ struct Map
     /**
      * Calling the constructor will load all coordinates from the file provided.
      */
-    Map(ConfigMap mapConfig);
+    Map(ConfigMap mapConfig, ConfigWindow windowConfig);
     ~Map();
 
     MapInfos infos;

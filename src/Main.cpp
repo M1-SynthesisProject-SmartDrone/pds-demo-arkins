@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     ));
     window.setVerticalSyncEnabled(params.window.enableVsync);
 
-    Engine engine(params.map);
+    Engine engine(params.map, params.window);
 
     Renderer renderer(params.image, params.window, engine.getMapInfos());
 

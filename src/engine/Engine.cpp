@@ -1,7 +1,7 @@
 #include "Engine.h"
 
-Engine::Engine(ConfigMap mapConfig) :
-    m_map(mapConfig),
+Engine::Engine(ConfigMap mapConfig, ConfigWindow windowConfig) :
+    m_map(mapConfig, windowConfig),
     m_droneCoordinates(m_map.droneCoordinates),
     m_arkins(m_map.attractivePoints, m_map.repulsivePoints, m_map.tangentialPoints, m_map.uniformFields)
 {}
