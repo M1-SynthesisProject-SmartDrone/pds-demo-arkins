@@ -130,6 +130,7 @@ void Renderer::renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, 
 void Renderer::renderUniformFields(std::vector<Coordinates>& uniformFields, sf::RenderWindow& window, float width, float height)
 {
     auto rectangle = createRectangle(width, height, UNIFORM_FIELD_COLOR);
+    rectangle.setFillColor(sf::Color::Transparent);
     for(const auto& field : uniformFields)
     {
         rectangle.setPosition(field.x, field.y);
