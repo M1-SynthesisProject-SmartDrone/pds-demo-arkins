@@ -133,7 +133,8 @@ void Renderer::renderUniformFields(std::vector<Coordinates>& uniformFields, sf::
     rectangle.setFillColor(sf::Color::Transparent);
     for(const auto& field : uniformFields)
     {
-        rectangle.setPosition(field.x, field.y);
+        auto pos = calculatePos(field);
+        rectangle.setPosition(pos);
         window.draw(rectangle);
     }
 }
@@ -207,5 +208,6 @@ sf::RectangleShape Renderer::createRectangle(float width, float height, const sf
     rectangle.setOutlineColor(color);
     rectangle.setOutlineThickness(UNIFORM_THICKNESS);
     rectangle.setOrigin(sf::Vector2f(width / 2, height / 2));
+    rectangle.setScale(sf::Vector2f(m_windowConfig.width / m_mapInfos.width, m_windowConfig.height / m_mapInfos.height));
     return rectangle;
 }

@@ -28,7 +28,7 @@ private:
     // ==== SIZES ====
     static inline const float GRID_THICKNESS = 2.0f;
     static inline const float CIRCLE_THICKNESS = 3.0f;
-    static inline const float UNIFORM_THICKNESS = 2.0f;
+    static inline const float UNIFORM_THICKNESS = 3.0f;
 
     const ConfigWindow m_windowConfig;
     const ConfigImage m_imageConfig;

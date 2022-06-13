@@ -23,8 +23,8 @@ using namespace std;
 #define UNITARY_VECTOR 0.5
 #define ATTRACTION_POINTS_SIZE 10
 #define REPULSION_RADIUS 130.0
-#define UNIFORM_HEIGHT 150
-#define UNIFORM_WIDTH 100
+#define UNIFORM_HEIGHT 150.f
+#define UNIFORM_WIDTH 100.f
 
 class Arkins
 {
