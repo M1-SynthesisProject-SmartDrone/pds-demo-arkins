@@ -44,6 +44,8 @@ void Arkins::process(Coordinates &droneCoordinates)
 	auto start = chrono::steady_clock::now();
 	bool isInRepulsivePoint = false;
 	bool isInUniformPoint = false;
+	bool isInTangentPoint = false;
+
 	for (Coordinates &repulsivePoint : repulsionPoints)
 	{
 		calculate_dist_between_points(droneCoordinates, repulsivePoint);
@@ -60,8 +62,15 @@ void Arkins::process(Coordinates &droneCoordinates)
 		if (isInUniformRadius(droneCoordinates, uniformPoint))
 		{
 			LOG_F(ERROR, "IT IS IN UNIFORM !!");
-
 			isInUniformPoint = true;
+		}
+	}
+
+	for(Coordinates &tangentPoint: tangentialPoints)
+	{
+		calculate_dist_between_points(droneCoordinates, tangentPoint);
+		if(isInTangentialRadius(droneCoordinates, tangentPoint)){
+			isInTangentPoint = true;
 		}
 	}
 
@@ -103,6 +112,12 @@ void Arkins::process(Coordinates &droneCoordinates)
 		for (Coordinates &uniformPoint : uniformPoints)
 		{
 			uniform(droneCoordinates, uniformPoint, barycenter, infos);
+		}
+	}
+	else if(isInTangentPoint){
+		for (Coordinates &tangentPoint: tangentialPoints)
+		{
+			tangent(droneCoordinates, tangentPoint, barycenter, infos);
 		}
 	}
 	else
@@ -274,6 +289,10 @@ bool Arkins::isInUniformRadius(Coordinates &droneCoordinates, Coordinates &unifo
 	return droneCoordinates.x >= (uniformRadius.x - UNIFORM_WIDTH / 2) && droneCoordinates.x <= (uniformRadius.x + UNIFORM_WIDTH / 2) && droneCoordinates.y >= (uniformRadius.y - UNIFORM_HEIGHT / 2) && droneCoordinates.y <= (uniformRadius.y + UNIFORM_HEIGHT / 2);
 }
 
+bool Arkins::isInTangentialRadius(Coordinates &droneCoordinates, Coordinates &tangentPoint){
+	return tangentPoint.distance_to_drone <= TANGENT_RADIUS;
+}
+
 void Arkins::calculate_vector(Coordinates &droneCoordinates, Coordinates &targetCoordinates, float &x, float &y, float &z)
 {
 	x = droneCoordinates.x - targetCoordinates.x;
@@ -314,14 +333,44 @@ void Arkins::repulsion(Coordinates &droneCoordinates, Coordinates &barycenter, C
 
 void Arkins::uniform(Coordinates &droneCoordinates, Coordinates &uniformPoint, Coordinates &goalPoint, Informations &infos)
 {
-	Vector ud;
+	Vector t;
 	Vector db;
 	Vector g;
-	calculate_vector(droneCoordinates, uniformPoint, ud);
+	t.vx = 1000;
+	t.vy = 0;
+	t.vz = 0;
+	t.vr = 0;
 	calculate_vector(droneCoordinates, goalPoint, db);
-	calculate_vector(ud, db, g);
+	//calculate_vector(t, db, g);
+	infos.vector = t;
+	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + t.vx);
+	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + t.vy);
+	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + t.vz);
+	//infos.ratioR = findRatio(droneCoordinates.r, droneCoordinates.r + t.vr);
+
+}
+
+
+void Arkins::tangent(Coordinates &droneCoordinates, Coordinates &tangentPoint, Coordinates &goalPoint, Informations &infos){
+	Vector td; // Vecteur centreTangentiel à Drone
+	Vector db; // Vecteur Drone à But
+	Vector v; //Vecteur tangentiel
+	Vector g; //Vecteur final
+	calculate_vector(tangentPoint, droneCoordinates, td);
+	v.vx = -td.vx;
+	v.vy = td.vy;
+	v.vz = td.vz;
+	v.vr = td.vr;
+	calculate_vector(tangentPoint, goalPoint, db);
+	g.vx = db.vx + v.vx;
+	g.vy = db.vy + v.vy;
+	g.vz = db.vz + v.vz;
+	g.vr = db.vr + db.vr;
+
 	infos.vector = g;
 	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + g.vx);
 	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + g.vy);
 	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + g.vz);
+	//infos.ratioR = findRatio(droneCoordinates.r, droneCoordinates.r + g.vr);
+
 }
