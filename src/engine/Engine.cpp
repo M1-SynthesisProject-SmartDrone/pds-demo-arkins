@@ -27,12 +27,19 @@ void Engine::update(Events& events)
 
     m_arkins.process(m_droneCoordinates);
     Informations& movementInfos = m_arkins.getInfos();
+    auto& vect = movementInfos.vector;
+
+
+    // Invert this vector (goes from destination to drone) and normalize it
+    auto inverted = vect.inverted();
+    auto direction = inverted.toUnitVector();
+    printf("dir x=%f, y=%f, z=%f\n", direction.vx, direction.vy, direction.vz);
     
     // Move the drone
-    m_droneCoordinates.x += movementInfos.ratioX * MOVEMENT_SPEED;
-    m_droneCoordinates.y += movementInfos.ratioY * MOVEMENT_SPEED;
-    m_droneCoordinates.z += movementInfos.ratioZ * MOVEMENT_SPEED;
-    m_droneCoordinates.rotation += movementInfos.ratioR * MOVEMENT_SPEED;
+    m_droneCoordinates.x += direction.vx * MOVEMENT_SPEED;
+    m_droneCoordinates.y += direction.vy * MOVEMENT_SPEED;
+    m_droneCoordinates.z += direction.vz * MOVEMENT_SPEED;
+    m_droneCoordinates.rotation += direction.vr * MOVEMENT_SPEED;
 
     // handle point removal
     if (movementInfos.inRange)
