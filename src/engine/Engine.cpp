@@ -98,12 +98,12 @@ vector<Coordinates>& Engine::getRepulsivePoints()
     return m_arkins.getRepulsionPoints();
 }
 
-vector<Coordinates>& Engine::getTangentialPoints()
+vector<Tangent>& Engine::getTangentialPoints()
 {
     return m_arkins.getTangentialPoints();
 }
 
-vector<Coordinates>& Engine::getUniformFields()
+vector<Uniform>& Engine::getUniformFields()
 {
     return m_arkins.getUniformPoints();
 }

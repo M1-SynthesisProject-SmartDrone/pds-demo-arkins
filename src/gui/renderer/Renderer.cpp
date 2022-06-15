@@ -127,7 +127,7 @@ void Renderer::renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, 
     }
 }
 
-void Renderer::renderUniformFields(std::vector<Coordinates>& uniformFields, sf::RenderWindow& window, float width, float height)
+void Renderer::renderUniformFields(std::vector<Uniform>& uniformFields, sf::RenderWindow& window, float width, float height)
 {
     auto rectangle = createRectangle(width, height, UNIFORM_FIELD_COLOR);
     rectangle.setFillColor(sf::Color::Transparent);
@@ -139,7 +139,7 @@ void Renderer::renderUniformFields(std::vector<Coordinates>& uniformFields, sf::
     }
 }
 
-void Renderer::renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window, float effectRadius)
+void Renderer::renderTangentialPoints(std::vector<Tangent>& tangentialPoints, sf::RenderWindow& window, float effectRadius)
 {
     auto point = createCircle(m_pointRadius, TANGENTIAL_POINT_COLOR);
     // We add another circle to show the effect radius

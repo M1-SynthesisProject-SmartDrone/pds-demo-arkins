@@ -33,8 +33,8 @@ public:
     Coordinates& getDroneCoordinates();
     vector<Coordinates>& getAttractivePoints();
     vector<Coordinates>& getRepulsivePoints();
-    vector<Coordinates>& getTangentialPoints();
-    vector<Coordinates>& getUniformFields();
+    vector<Tangent>& getTangentialPoints();
+    vector<Uniform>& getUniformFields();
 };
 
 #endif // __ENGINE_H__

@@ -8,6 +8,8 @@
 
 #include "config/ConfigParams.h"
 #include "engine/data/Coordinates.h"
+#include "engine/data/Tangent.h"
+#include "engine/data/Uniform.h"
 #include "engine/map/MapInfos.h"
 
 class Renderer
@@ -93,8 +95,8 @@ public:
     void renderDrone(Coordinates& droneCoordinates, sf::RenderWindow& window);
     void renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window, float radius);
     void renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window, float effectRadius);
-    void renderTangentialPoints(std::vector<Coordinates>& tangentialPoints, sf::RenderWindow& window, float effectRadius);
-    void renderUniformFields(std::vector<Coordinates>& uniformFields, sf::RenderWindow& window, float width, float height);
+    void renderTangentialPoints(std::vector<Tangent>& tangentialPoints, sf::RenderWindow& window, float effectRadius);
+    void renderUniformFields(std::vector<Uniform>& uniformFields, sf::RenderWindow& window, float width, float height);
 };
 
 #endif // __RENDERER_H__

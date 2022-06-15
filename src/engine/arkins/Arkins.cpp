@@ -5,7 +5,7 @@ Arkins::Arkins()
 }
 
 Arkins::Arkins(std::vector<Coordinates> attractionPoints, std::vector<Coordinates> repulsionPoints,
-			   std::vector<Coordinates> tangentialPoints, std::vector<Coordinates> uniformPoints) : attractionPoints(attractionPoints),
+			   std::vector<Tangent> tangentialPoints, std::vector<Uniform> uniformPoints) : attractionPoints(attractionPoints),
 																									repulsionPoints(repulsionPoints), tangentialPoints(tangentialPoints), uniformPoints(uniformPoints)
 {
 }
@@ -30,12 +30,12 @@ std::vector<Coordinates> &Arkins::getRepulsionPoints()
 	return repulsionPoints;
 }
 
-std::vector<Coordinates> &Arkins::getTangentialPoints()
+std::vector<Tangent> &Arkins::getTangentialPoints()
 {
 	return tangentialPoints;
 }
 
-std::vector<Coordinates> &Arkins::getUniformPoints()
+std::vector<Uniform> &Arkins::getUniformPoints()
 {
 	return uniformPoints;
 }
@@ -55,7 +55,7 @@ void Arkins::process(Coordinates &droneCoordinates)
 		}
 	}
 
-	for (Coordinates &uniformPoint : uniformPoints)
+	for (Uniform &uniformPoint : uniformPoints)
 	{
 		LOG_F(ERROR, "Informations Drone: px: %f | py: %f | pz: %f", droneCoordinates.x, droneCoordinates.y, droneCoordinates.z);
 		LOG_F(ERROR, "Informations Uniform: px: %f | py: %f | pz: %f", uniformPoint.x, uniformPoint.y, uniformPoint.z);
@@ -66,7 +66,7 @@ void Arkins::process(Coordinates &droneCoordinates)
 		}
 	}
 
-	for(Coordinates &tangentPoint: tangentialPoints)
+	for(Tangent &tangentPoint: tangentialPoints)
 	{
 		calculate_dist_between_points(droneCoordinates, tangentPoint);
 		if(isInTangentialRadius(droneCoordinates, tangentPoint)){
@@ -109,13 +109,13 @@ void Arkins::process(Coordinates &droneCoordinates)
 	}
 	else if (isInUniformPoint)
 	{
-		for (Coordinates &uniformPoint : uniformPoints)
+		for (Uniform &uniformPoint : uniformPoints)
 		{
 			uniform(droneCoordinates, uniformPoint, barycenter, infos);
 		}
 	}
 	else if(isInTangentPoint){
-		for (Coordinates &tangentPoint: tangentialPoints)
+		for (Tangent &tangentPoint: tangentialPoints)
 		{
 			tangent(droneCoordinates, tangentPoint, barycenter, infos);
 		}
@@ -207,6 +207,18 @@ void Arkins::calculate_dist_between_points(Coordinates &droneCoordinates, Coordi
 	attractionPoint.distance_to_drone = dist;
 }
 
+void Arkins::calculate_dist_between_points(Coordinates &droneCoordinates, Uniform &uniformPoint)
+{
+	float dist = abs(sqrt(pow((droneCoordinates.x - uniformPoint.x), 2) + pow((droneCoordinates.y - uniformPoint.y), 2) + pow((droneCoordinates.z - uniformPoint.z), 2)));
+	uniformPoint.distance_to_drone = dist;
+}
+
+void Arkins::calculate_dist_between_points(Coordinates &droneCoordinates, Tangent &tangentPoint)
+{
+	float dist = abs(sqrt(pow((droneCoordinates.x - tangentPoint.x), 2) + pow((droneCoordinates.y - tangentPoint.y), 2) + pow((droneCoordinates.z - tangentPoint.z), 2)));
+	tangentPoint.distance_to_drone = dist;
+}
+
 void Arkins::calculate_coefficient_attraction(std::vector<Coordinates> &vector, float maxDistance)
 {
 	if (vector.size() == 1)
@@ -284,12 +296,12 @@ bool Arkins::isInRepulsionRadius(Coordinates &droneCoordinates, Coordinates &rep
 	return repulsionPoint.distance_to_drone <= REPULSION_RADIUS;
 }
 
-bool Arkins::isInUniformRadius(Coordinates &droneCoordinates, Coordinates &uniformRadius)
+bool Arkins::isInUniformRadius(Coordinates &droneCoordinates, Uniform &uniformPoint)
 {
-	return droneCoordinates.x >= (uniformRadius.x - UNIFORM_WIDTH / 2) && droneCoordinates.x <= (uniformRadius.x + UNIFORM_WIDTH / 2) && droneCoordinates.y >= (uniformRadius.y - UNIFORM_HEIGHT / 2) && droneCoordinates.y <= (uniformRadius.y + UNIFORM_HEIGHT / 2);
+	return droneCoordinates.x >= (uniformPoint.x - UNIFORM_WIDTH / 2) && droneCoordinates.x <= (uniformPoint.x + UNIFORM_WIDTH / 2) && droneCoordinates.y >= (uniformPoint.y - UNIFORM_HEIGHT / 2) && droneCoordinates.y <= (uniformPoint.y + UNIFORM_HEIGHT / 2);
 }
 
-bool Arkins::isInTangentialRadius(Coordinates &droneCoordinates, Coordinates &tangentPoint){
+bool Arkins::isInTangentialRadius(Coordinates &droneCoordinates, Tangent &tangentPoint){
 	return tangentPoint.distance_to_drone <= TANGENT_RADIUS;
 }
 
@@ -297,14 +309,28 @@ void Arkins::calculate_vector(Coordinates &droneCoordinates, Coordinates &target
 {
 	x = droneCoordinates.x - targetCoordinates.x;
 	y = droneCoordinates.y - targetCoordinates.y;
-	z = droneCoordinates.z - droneCoordinates.z;
+	z = droneCoordinates.z - targetCoordinates.z;
+}
+
+void Arkins::calculate_vector(Tangent &tangentCoordinates, Coordinates &droneCoordinates, Vector &vector)
+{
+	vector.vx = droneCoordinates.x - tangentCoordinates.x;
+	vector.vy = droneCoordinates.y - tangentCoordinates.y;
+	vector.vz = droneCoordinates.z - tangentCoordinates.z;
+}
+
+void Arkins::calculate_vector(Coordinates &droneCoordinates, Uniform &uniformCoordinates, Vector &vector)
+{
+	vector.vx = droneCoordinates.x - uniformCoordinates.x;
+	vector.vy = droneCoordinates.y - uniformCoordinates.y;
+	vector.vz = droneCoordinates.z - uniformCoordinates.z;
 }
 
 void Arkins::calculate_vector(Coordinates &droneCoordinates, Coordinates &targetCoordinates, Vector &vector)
 {
 	vector.vx = droneCoordinates.x - targetCoordinates.x;
 	vector.vy = droneCoordinates.y - targetCoordinates.y;
-	vector.vz = droneCoordinates.z - droneCoordinates.z;
+	vector.vz = droneCoordinates.z - targetCoordinates.z;
 }
 
 void Arkins::calculate_vector(Vector &vect1, Vector &vect2, Vector &vector)
@@ -331,13 +357,17 @@ void Arkins::repulsion(Coordinates &droneCoordinates, Coordinates &barycenter, C
 	//		rd.vx, rd.vy, rd.vz, db.vx, db.vy, db.vz, g.vx, g.vy, g.vz, infos.ratioX, infos.ratioY, infos.ratioZ);
 }
 
-void Arkins::uniform(Coordinates &droneCoordinates, Coordinates &uniformPoint, Coordinates &goalPoint, Informations &infos)
+void Arkins::uniform(Coordinates &droneCoordinates, Uniform& uniformPoint, Coordinates &goalPoint, Informations &infos)
 {
 	Vector t;
 	Vector db;
 	Vector g;
-	t.vx = 1000;
-	t.vy = 0;
+	//t.vx = 1000;
+	//t.vy = 0;
+	//t.vz = 0;
+	//t.vr = 0;
+	t.vx = uniformPoint.wayx * 1000;
+	t.vy = uniformPoint.wayy * 1000;
 	t.vz = 0;
 	t.vr = 0;
 	calculate_vector(droneCoordinates, goalPoint, db);
@@ -351,16 +381,24 @@ void Arkins::uniform(Coordinates &droneCoordinates, Coordinates &uniformPoint, C
 }
 
 
-void Arkins::tangent(Coordinates &droneCoordinates, Coordinates &tangentPoint, Coordinates &goalPoint, Informations &infos){
+void Arkins::tangent(Coordinates &droneCoordinates, Tangent& tangentPoint, Coordinates &goalPoint, Informations &infos){
 	Vector td; // Vecteur centreTangentiel à Drone
 	Vector db; // Vecteur Drone à But
 	Vector v; //Vecteur tangentiel
 	Vector g; //Vecteur final
 	calculate_vector(tangentPoint, droneCoordinates, td);
-	v.vx = -td.vx;
-	v.vy = td.vy;
-	v.vz = td.vz;
-	v.vr = td.vr;
+	if(tangentPoint.isClockwise){ //clockwise
+		v.vx = td.vx;
+		v.vy = -td.vy;
+		v.vz = td.vz;
+		v.vr = td.vr;
+	}
+	else{ //Counter clockwise
+		v.vx = -td.vx;
+		v.vy = td.vy;
+		v.vz = td.vz;
+		v.vr = td.vr;
+	}
 	calculate_vector(tangentPoint, goalPoint, db);
 	g.vx = db.vx + v.vx;
 	g.vy = db.vy + v.vy;
