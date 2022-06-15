@@ -39,7 +39,7 @@ void Engine::update(Events& events)
     m_droneCoordinates.x += direction.vx * MOVEMENT_SPEED;
     m_droneCoordinates.y += direction.vy * MOVEMENT_SPEED;
     m_droneCoordinates.z += direction.vz * MOVEMENT_SPEED;
-    m_droneCoordinates.rotation += direction.vr * MOVEMENT_SPEED;
+    // m_droneCoordinates.rotation += direction.vr * MOVEMENT_SPEED;
 
     // handle point removal
     if (movementInfos.inRange)

@@ -320,8 +320,8 @@ void Arkins::repulsion(Coordinates &droneCoordinates, Coordinates &barycenter, C
 	Vector rd;
 	Vector db;
 	Vector g;
-	calculate_vector(droneCoordinates, repulsivePoint, rd);
-	calculate_vector(barycenter, droneCoordinates, db);
+	calculate_vector(repulsivePoint, droneCoordinates, rd);
+	calculate_vector(droneCoordinates, barycenter, db);
 	calculate_vector(rd, db, g);
 	infos.vector = g;
 	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + g.vx);
