@@ -1,10 +1,9 @@
 #ifndef __UNIFORM_H__
 #define __UNIFORM_H__
 
-struct Uniform {
-		float x = 0;
-		float y = 0;
-		float z = 0;
+#include "Point.h"
+
+struct Uniform : Point {
 		float distance_to_drone = 0; // distance entre point et drone
 		int wayx = 0;
 		int wayy = 0;

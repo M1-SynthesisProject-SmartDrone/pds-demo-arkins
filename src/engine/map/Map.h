@@ -5,6 +5,8 @@
 
 #include "config/ConfigParams.h"
 #include "engine/data/Coordinates.h"
+#include "engine/data/Tangent.h"
+#include "engine/data/Uniform.h"
 #include "MapInfos.h"
 
 /**
@@ -23,8 +25,8 @@ struct Map
     Coordinates droneCoordinates;
     std::vector<Coordinates> attractivePoints;
     std::vector<Coordinates> repulsivePoints;
-    std::vector<Coordinates> tangentialPoints;
-    std::vector<Coordinates> uniformFields;
+    std::vector<Tangent> tangentialPoints;
+    std::vector<Uniform> uniformFields;
 };
 
 #endif // __MAP_H__

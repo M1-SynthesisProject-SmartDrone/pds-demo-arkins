@@ -6,6 +6,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "gui/shapes/ArrowShape.h"
+
 #include "config/ConfigParams.h"
 #include "engine/data/Coordinates.h"
 #include "engine/data/Tangent.h"
@@ -30,7 +32,8 @@ private:
     // ==== SIZES ====
     static inline const float GRID_THICKNESS = 2.0f;
     static inline const float CIRCLE_THICKNESS = 3.0f;
-    static inline const float UNIFORM_THICKNESS = 3.0f;
+    static inline const float UNIFORM_THICKNESS = 4.0f;
+    static inline const float ARROW_HEAD_SCALE = 60.0f;
 
     const ConfigWindow m_windowConfig;
     const ConfigImage m_imageConfig;
@@ -49,6 +52,7 @@ private:
 
     // We don't want to calculate some values over and over
     float m_pointRadius;
+    sf::Vector2f m_arrowSize;
 
     // ==== PRIVATE METHODS ====
     /**
@@ -59,7 +63,7 @@ private:
     // ---- Position & size calculation from the map & window infos ----
     float calculateXPos(float x);
     float calculateYPos(float y);
-    sf::Vector2f calculatePos(const Coordinates& coordinates);
+    sf::Vector2f calculatePos(const Point* point);
     float calculateRadius(float r);
 
     // ---- Shape creation ----
@@ -75,6 +79,11 @@ private:
      * Create a rectangle with the origin at the center.
      */
     sf::RectangleShape createRectangle(float width, float height, const sf::Color& color);
+
+    /**
+     * Create a customized arrow
+     */
+    ArrowShape createArrow(const sf::Color& color, float tailLength = 0.f);
 
 public:
     /**

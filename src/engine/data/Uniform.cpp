@@ -4,5 +4,5 @@ Uniform::Uniform(){
 }
 
 Uniform::Uniform(float x, float y, float z, int wayx, int wayy) :
-	x(x), y(y), z(z), wayx(wayx), wayy(wayy)
+	Point(x, y, z), wayx(wayx), wayy(wayy)
 {}

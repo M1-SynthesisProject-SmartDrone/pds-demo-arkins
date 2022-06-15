@@ -13,10 +13,14 @@ namespace fs = std::filesystem;
 nlohmann::json loadJson(const std::string& filename);
 Coordinates findDroneCoordinates(const nlohmann::json& json);
 vector<Coordinates> findPoints(const nlohmann::json& json, const char* fieldName);
+vector<Tangent> findTangents(const nlohmann::json& json, const char* fieldName);
+vector<Uniform> findUniforms(const nlohmann::json& json, const char* fieldName);
 
 // Update the MapInfos struct if new min or max values are found
-void updateBoundaries(const Coordinates& coordinates, MapInfos& infos);
+void updateBoundaries(const Point* point, MapInfos& infos);
 void updateBoundaries(const vector<Coordinates>& points, MapInfos& infos);
+void updateBoundaries(const vector<Uniform>& points, MapInfos& infos);
+void updateBoundaries(const vector<Tangent>& points, MapInfos& infos);
 
 Map::Map(ConfigMap mapConfig, ConfigWindow windowConfig)
 {
@@ -26,8 +30,8 @@ Map::Map(ConfigMap mapConfig, ConfigWindow windowConfig)
     droneCoordinates = findDroneCoordinates(json);
     attractivePoints = findPoints(json, "attractivePoints");
     repulsivePoints = findPoints(json, "repulsivePoints");
-    tangentialPoints = findPoints(json, "tangentialPoints");
-    uniformFields = findPoints(json, "uniformFields");
+    tangentialPoints = findTangents(json, "tangentialPoints");
+    uniformFields = findUniforms(json, "uniformFields");
 
     LOG_F(INFO, "Create map infos");
     // Create map infos
@@ -55,7 +59,7 @@ Map::Map(ConfigMap mapConfig, ConfigWindow windowConfig)
 
     // We want to have the same ratio as the window we will display on
     float mapRatio = infos.width / infos.height;
-    float windowRatio = (float) windowConfig.width / (float) windowConfig.height;
+    float windowRatio = (float)windowConfig.width / (float)windowConfig.height;
     printf("Map ratio : %f, Window ratio : %f\n", mapRatio, windowRatio);
     if (mapRatio > windowRatio)
     {
@@ -122,10 +126,47 @@ vector<Coordinates> findPoints(const nlohmann::json& json, const char* fieldName
     return points;
 }
 
-void updateBoundaries(const Coordinates& coordinates, MapInfos& infos)
+vector<Tangent> findTangents(const nlohmann::json& json, const char* fieldName)
 {
-    auto x = coordinates.x;
-    auto y = coordinates.y;
+    auto jsonArray = json[fieldName];
+    vector<Tangent> points;
+    points.reserve(jsonArray.size());
+
+    for (const auto& j : jsonArray)
+    {
+        points.push_back(Tangent(
+            j["x"],
+            j["y"],
+            0.0f,
+            j["isClockwise"]
+        ));
+    }
+    return points;
+}
+
+vector<Uniform> findUniforms(const nlohmann::json& json, const char* fieldName)
+{
+    auto jsonArray = json[fieldName];
+    vector<Uniform> points;
+    points.reserve(jsonArray.size());
+
+    for (const auto& j : jsonArray)
+    {
+        points.push_back(Uniform(
+            j["x"],
+            j["y"],
+            0.0f,
+            j["wayX"],
+            j["wayY"]
+        ));
+    }
+    return points;
+}
+
+void updateBoundaries(const Point* point, MapInfos& infos)
+{
+    auto x = point->x;
+    auto y = point->y;
 
     if (x < infos.minX)
     {
@@ -149,6 +190,22 @@ void updateBoundaries(const vector<Coordinates>& points, MapInfos& infos)
 {
     for (const auto& p : points)
     {
-        updateBoundaries(p, infos);
+        updateBoundaries(&p, infos);
+    }
+}
+
+void updateBoundaries(const vector<Uniform>& points, MapInfos& infos)
+{
+    for (const auto& p : points)
+    {
+        updateBoundaries(&p, infos);
+    }
+}
+
+void updateBoundaries(const vector<Tangent>& points, MapInfos& infos)
+{
+    for (const auto& p : points)
+    {
+        updateBoundaries(&p, infos);
     }
 }

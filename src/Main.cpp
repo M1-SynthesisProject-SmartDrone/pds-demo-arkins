@@ -10,6 +10,8 @@
 #include "gui/events/event_manager.h"
 #include "gui/renderer/Renderer.h"
 
+#include "gui/shapes/ArrowShape.h"
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -53,12 +55,11 @@ int main(int argc, char *argv[])
 
         // ==== Application logic (arkins in our case) ====
         engine.update(events);
-        
-        
+
         // ==== Rendering ====
         window.clear(bgColor);
         // Draw entities here
-        
+
         renderer.renderGrid(window);
         renderer.renderAttractivePoints(engine.getAttractivePoints(), window, RANGE);
         renderer.renderRepulsivePoints(engine.getRepulsivePoints(), window, REPULSION_RADIUS);
