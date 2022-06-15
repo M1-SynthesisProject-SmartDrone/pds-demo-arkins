@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <math.h>
 
 #include <loguru/loguru.hpp>
 
@@ -43,8 +44,8 @@ Renderer::Renderer(ConfigImage imageConfig, ConfigWindow windowConfig, MapInfos 
 
     // Precalculation of some values
     m_pointRadius = min(m_windowConfig.width, m_windowConfig.height) * 0.025f;
-
     m_arrowSize = sf::Vector2f(ARROW_HEAD_SCALE * scaleX, ARROW_HEAD_SCALE * scaleY);
+    m_scaleVector = sf::Vector2f(m_windowConfig.width / m_mapInfos.width, m_windowConfig.height / m_mapInfos.height);
 }
 
 Renderer::~Renderer()
@@ -136,11 +137,40 @@ void Renderer::renderUniformFields(std::vector<Uniform>& uniformFields, sf::Rend
 {
     auto rectangle = createRectangle(width, height, UNIFORM_FIELD_COLOR);
     rectangle.setFillColor(sf::Color::Transparent);
+    ArrowShape arrow;
+    if (width < height)
+    {
+        arrow = createArrow(UNIFORM_FIELD_COLOR, width / 2.f * m_scaleVector.x);
+    }
+    else
+    {
+        arrow = createArrow(UNIFORM_FIELD_COLOR, height / 2.f * m_scaleVector.y);
+    }
     for (const auto& field : uniformFields)
     {
         auto pos = calculatePos(&field);
         rectangle.setPosition(pos);
+        arrow.setPosition(pos);
+        
+        // Find the angle from the vector (using dot product)
+        // angle = (v.b) / (|v| * |b|)
+        // Here, b is unit vector, b = (0, -1) and |b| = 1
+        int vx = field.wayx, vy = field.wayy;
+        float vNorm = sqrt(vx * vx + vy * vy);
+        float sign = vx < 0 || vy < 0 ? -1.f : 1.f;
+        float angleDeg = sign * acos((vy * -1.f) / vNorm) * 180.f / M_PI;
+        if (angleDeg > 0.f)
+        {
+            angleDeg = 360.0f - angleDeg;
+        }
+        else
+        {
+            angleDeg = abs(angleDeg);
+        }
+        arrow.setRotation(angleDeg);
+
         window.draw(rectangle);
+        window.draw(arrow);
     }
 }
 
@@ -204,7 +234,7 @@ sf::CircleShape Renderer::createCircle(float radius, const sf::Color& color, boo
     circle.setOrigin(radius, radius);
     if (colorOutline)
     {
-        circle.setScale(sf::Vector2f(m_windowConfig.width / m_mapInfos.width, m_windowConfig.height / m_mapInfos.height));
+        circle.setScale(m_scaleVector);
         circle.setFillColor(sf::Color::Transparent);
         circle.setOutlineColor(color);
         circle.setOutlineThickness(CIRCLE_THICKNESS);
@@ -223,7 +253,7 @@ sf::RectangleShape Renderer::createRectangle(float width, float height, const sf
     rectangle.setOutlineColor(color);
     rectangle.setOutlineThickness(UNIFORM_THICKNESS);
     rectangle.setOrigin(sf::Vector2f(width / 2, height / 2));
-    rectangle.setScale(sf::Vector2f(m_windowConfig.width / m_mapInfos.width, m_windowConfig.height / m_mapInfos.height));
+    rectangle.setScale(m_scaleVector);
     return rectangle;
 }
 

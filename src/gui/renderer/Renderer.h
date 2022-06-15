@@ -52,6 +52,7 @@ private:
 
     // We don't want to calculate some values over and over
     float m_pointRadius;
+    sf::Vector2f m_scaleVector;
     sf::Vector2f m_arrowSize;
 
     // ==== PRIVATE METHODS ====
