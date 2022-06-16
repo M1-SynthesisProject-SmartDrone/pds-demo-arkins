@@ -157,7 +157,9 @@ vector<Uniform> findUniforms(const nlohmann::json& json, const char* fieldName)
             j["y"],
             0.0f,
             j["wayX"],
-            j["wayY"]
+            j["wayY"],
+            j["width"],
+            j["height"]
         ));
     }
     return points;

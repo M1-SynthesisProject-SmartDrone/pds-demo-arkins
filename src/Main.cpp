@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
         renderer.renderAttractivePoints(engine.getAttractivePoints(), window, RANGE);
         renderer.renderRepulsivePoints(engine.getRepulsivePoints(), window, REPULSION_RADIUS);
         renderer.renderTangentialPoints(engine.getTangentialPoints(), window, 100.0);
-        renderer.renderUniformFields(engine.getUniformFields(), window, UNIFORM_WIDTH, UNIFORM_HEIGHT);
+        renderer.renderUniformFields(engine.getUniformFields(), window);
 
         renderer.renderbarycenter(engine.getBarycenter(), window);
 

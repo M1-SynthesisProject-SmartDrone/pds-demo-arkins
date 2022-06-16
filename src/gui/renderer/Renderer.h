@@ -32,7 +32,7 @@ private:
     // ==== SIZES ====
     static inline const float GRID_THICKNESS = 2.0f;
     static inline const float CIRCLE_THICKNESS = 3.0f;
-    static inline const float UNIFORM_THICKNESS = 4.0f;
+    static inline const float UNIFORM_THICKNESS = 10.0f;
     static inline const float ARROW_HEAD_SCALE = 60.0f;
 
     const ConfigWindow m_windowConfig;
@@ -106,7 +106,7 @@ public:
     void renderAttractivePoints(std::vector<Coordinates>& attractivePoints, sf::RenderWindow& window, float radius);
     void renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, sf::RenderWindow& window, float effectRadius);
     void renderTangentialPoints(std::vector<Tangent>& tangentialPoints, sf::RenderWindow& window, float effectRadius);
-    void renderUniformFields(std::vector<Uniform>& uniformFields, sf::RenderWindow& window, float width, float height);
+    void renderUniformFields(std::vector<Uniform>& uniformFields, sf::RenderWindow& window);
 };
 
 #endif // __RENDERER_H__

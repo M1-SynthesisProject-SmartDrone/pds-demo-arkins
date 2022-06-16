@@ -298,7 +298,7 @@ bool Arkins::isInRepulsionRadius(Coordinates &droneCoordinates, Coordinates &rep
 
 bool Arkins::isInUniformRadius(Coordinates &droneCoordinates, Uniform &uniformPoint)
 {
-	return droneCoordinates.x >= (uniformPoint.x - UNIFORM_WIDTH / 2) && droneCoordinates.x <= (uniformPoint.x + UNIFORM_WIDTH / 2) && droneCoordinates.y >= (uniformPoint.y - UNIFORM_HEIGHT / 2) && droneCoordinates.y <= (uniformPoint.y + UNIFORM_HEIGHT / 2);
+	return droneCoordinates.x >= (uniformPoint.x - uniformPoint.width / 2) && droneCoordinates.x <= (uniformPoint.x + uniformPoint.width / 2) && droneCoordinates.y >= (uniformPoint.y - uniformPoint.height / 2) && droneCoordinates.y <= (uniformPoint.y + uniformPoint.height / 2);
 }
 
 bool Arkins::isInTangentialRadius(Coordinates &droneCoordinates, Tangent &tangentPoint){
@@ -387,6 +387,7 @@ void Arkins::tangent(Coordinates &droneCoordinates, Tangent& tangentPoint, Coord
 	Vector v; //Vecteur tangentiel
 	Vector g; //Vecteur final
 	calculate_vector(tangentPoint, droneCoordinates, td);
+	LOG_F(ERROR, "Tangent Point | isClockwise : %d", tangentPoint.isClockwise);
 	if(tangentPoint.isClockwise){ //clockwise
 		v.vx = td.vx;
 		v.vy = -td.vy;

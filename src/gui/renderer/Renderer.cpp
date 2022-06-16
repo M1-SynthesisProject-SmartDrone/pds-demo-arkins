@@ -133,21 +133,21 @@ void Renderer::renderRepulsivePoints(std::vector<Coordinates>& repulsivePoints, 
     }
 }
 
-void Renderer::renderUniformFields(std::vector<Uniform>& uniformFields, sf::RenderWindow& window, float width, float height)
+void Renderer::renderUniformFields(std::vector<Uniform>& uniformFields, sf::RenderWindow& window)
 {
-    auto rectangle = createRectangle(width, height, UNIFORM_FIELD_COLOR);
-    rectangle.setFillColor(sf::Color::Transparent);
-    ArrowShape arrow;
-    if (width < height)
-    {
-        arrow = createArrow(UNIFORM_FIELD_COLOR, width / 2.f * m_scaleVector.x);
-    }
-    else
-    {
-        arrow = createArrow(UNIFORM_FIELD_COLOR, height / 2.f * m_scaleVector.y);
-    }
     for (const auto& field : uniformFields)
     {
+        auto rectangle = createRectangle(field.width, field.height, UNIFORM_FIELD_COLOR);
+        rectangle.setFillColor(sf::Color::Transparent);
+        ArrowShape arrow;
+        if (field.width < field.height)
+        {
+            arrow = createArrow(UNIFORM_FIELD_COLOR, field.width / 2.f * m_scaleVector.x);
+        }
+        else
+        {
+            arrow = createArrow(UNIFORM_FIELD_COLOR, field.height / 2.f * m_scaleVector.y);
+        }
         auto pos = calculatePos(&field);
         rectangle.setPosition(pos);
         arrow.setPosition(pos);
@@ -188,7 +188,6 @@ void Renderer::renderTangentialPoints(std::vector<Tangent>& tangentialPoints, sf
 
         effectRadiusShape.setPosition(pos);
         
-        cout << c.isClockwise << endl;
         auto arrowAngle = c.isClockwise ? 270.f : 90.f;
         arrow.setRotation(arrowAngle);
         arrow.setPosition({ pos.x, pos.y - (effectRadiusShape.getRadius() * effectRadiusShape.getScale().y) });
