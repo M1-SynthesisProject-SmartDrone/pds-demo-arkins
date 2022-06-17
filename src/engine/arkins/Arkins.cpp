@@ -372,8 +372,8 @@ void Arkins::uniform(Coordinates &droneCoordinates, Uniform& uniformPoint, Coord
 	Vector t;
 	Vector dg;
 	Vector g;
-	t.vx = uniformPoint.wayx * 150;
-	t.vy = uniformPoint.wayy * 150;
+	t.vx = uniformPoint.wayx * 200;
+	t.vy = uniformPoint.wayy * 200;
 	t.vz = 0;
 	t.vr = 0;
 	calculate_vector(droneCoordinates, goalPoint, dg);
@@ -399,15 +399,15 @@ void Arkins::tangent(Coordinates &droneCoordinates, Tangent& tangentPoint, Coord
 	calculate_vector(tangentPoint, droneCoordinates, td);
 	//LOG_F(ERROR, "Tangent Point | isClockwise : %d", tangentPoint.isClockwise);
 	if(tangentPoint.isClockwise){ //clockwise
-		v.vx = td.vy;
-		v.vy = -td.vx;
-		v.vz = td.vz;
+		v.vx = td.vy * 1.3;
+		v.vy = -td.vx * 1.3;
+		v.vz = td.vz * 1.3;
 		v.vr = td.vr;
 	}
 	else{ //Counter clockwise
-		v.vx = -td.vy;
-		v.vy = td.vx;
-		v.vz = td.vz;
+		v.vx = -td.vy * 1.3;
+		v.vy = td.vx * 1.3;
+		v.vz = td.vz * 1.3;
 		v.vr = td.vr;
 	}
 	calculate_vector(droneCoordinates, goalPoint, db);

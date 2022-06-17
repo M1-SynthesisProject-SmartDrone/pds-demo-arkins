@@ -41,7 +41,7 @@ private:
     const std::filesystem::path m_imageFolderPath;
 
     // This is kept as we load an image for this element
-    static inline constexpr float DRONE_SIZE_RATIO = 0.07f;
+    static inline constexpr float DRONE_SIZE_RATIO = 0.05f;
     sf::Texture m_droneTexture;
     sf::RectangleShape m_droneSprite;
 
