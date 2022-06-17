@@ -24,7 +24,7 @@ using namespace std;
 #define RANGE 50.0f
 #define UNITARY_VECTOR 0.5
 #define ATTRACTION_POINTS_SIZE 10
-#define REPULSION_RADIUS 130.0f
+#define REPULSION_RADIUS 100.0f
 #define TANGENT_RADIUS 100.0f
 
 class Arkins

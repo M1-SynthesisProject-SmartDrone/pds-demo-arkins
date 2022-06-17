@@ -57,11 +57,11 @@ void Arkins::process(Coordinates &droneCoordinates)
 
 	for (Uniform &uniformPoint : uniformPoints)
 	{
-		LOG_F(ERROR, "Informations Drone: px: %f | py: %f | pz: %f", droneCoordinates.x, droneCoordinates.y, droneCoordinates.z);
-		LOG_F(ERROR, "Informations Uniform: px: %f | py: %f | pz: %f", uniformPoint.x, uniformPoint.y, uniformPoint.z);
+		//LOG_F(ERROR, "Informations Drone: px: %f | py: %f | pz: %f", droneCoordinates.x, droneCoordinates.y, droneCoordinates.z);
 		if (isInUniformRadius(droneCoordinates, uniformPoint))
 		{
 			LOG_F(ERROR, "IT IS IN UNIFORM !!");
+
 			isInUniformPoint = true;
 		}
 	}
@@ -111,13 +111,18 @@ void Arkins::process(Coordinates &droneCoordinates)
 	{
 		for (Uniform &uniformPoint : uniformPoints)
 		{
-			uniform(droneCoordinates, uniformPoint, barycenter, infos);
+			if (isInUniformRadius(droneCoordinates, uniformPoint))
+			{
+				uniform(droneCoordinates, uniformPoint, barycenter, infos);
+			}
 		}
 	}
 	else if(isInTangentPoint){
 		for (Tangent &tangentPoint: tangentialPoints)
 		{
-			tangent(droneCoordinates, tangentPoint, barycenter, infos);
+			if(isInTangentialRadius(droneCoordinates, tangentPoint)){
+				tangent(droneCoordinates, tangentPoint, barycenter, infos);
+			}
 		}
 	}
 	else
@@ -349,33 +354,38 @@ void Arkins::repulsion(Coordinates &droneCoordinates, Coordinates &barycenter, C
 	calculate_vector(repulsivePoint, droneCoordinates, rd);
 	calculate_vector(droneCoordinates, barycenter, db);
 	calculate_vector(rd, db, g);
+	/*g.vx = g.vx * 100;
+	g.vy = g.vy * 100;
+	g.vz = g.vz * 100;*/
 	infos.vector = g;
 	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + g.vx);
 	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + g.vy);
 	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + g.vz);
-	// LOG_F(ERROR, " rdvx:%f rdvy:%f rdvz:%f | dbvx:%f dbvy:%f dbvz:%f| gvx:%f gvy:%f gvz:%f | irx:%f iry:%f irz:%f ",
-	//		rd.vx, rd.vy, rd.vz, db.vx, db.vy, db.vz, g.vx, g.vy, g.vz, infos.ratioX, infos.ratioY, infos.ratioZ);
+	LOG_F(ERROR, " rdvx:%f rdvy:%f rdvz:%f | dbvx:%f dbvy:%f dbvz:%f| gvx:%f gvy:%f gvz:%f | irx:%f iry:%f irz:%f ",
+			rd.vx, rd.vy, rd.vz, db.vx, db.vy, db.vz, g.vx, g.vy, g.vz, infos.ratioX, infos.ratioY, infos.ratioZ);
 }
 
 void Arkins::uniform(Coordinates &droneCoordinates, Uniform& uniformPoint, Coordinates &goalPoint, Informations &infos)
 {
+	LOG_F(ERROR, "Informations Uniform: ux: %f | uy: %f | uz: %f | uw: %d | uh : %d | uwx : %d | uwy : %d", uniformPoint.x, uniformPoint.y, uniformPoint.z,
+				uniformPoint.width, uniformPoint.height, uniformPoint.wayx, uniformPoint.wayy);
 	Vector t;
-	Vector db;
+	Vector dg;
 	Vector g;
-	//t.vx = 1000;
-	//t.vy = 0;
-	//t.vz = 0;
-	//t.vr = 0;
-	t.vx = uniformPoint.wayx * 1000;
-	t.vy = uniformPoint.wayy * 1000;
+	t.vx = uniformPoint.wayx * 150;
+	t.vy = uniformPoint.wayy * 150;
 	t.vz = 0;
 	t.vr = 0;
-	calculate_vector(droneCoordinates, goalPoint, db);
-	//calculate_vector(t, db, g);
+	calculate_vector(droneCoordinates, goalPoint, dg);
+	t.vx = t.vx + dg.vx;
+	t.vy = t.vy + dg.vy;
+	t.vz = t.vz + dg.vz;
+	t.vr = t.vr + dg.vr;
+
 	infos.vector = t;
-	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + t.vx);
-	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + t.vy);
-	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + t.vz);
+	infos.ratioX = findRatio(droneCoordinates.x, droneCoordinates.x + t.vx + dg.vx);
+	infos.ratioY = findRatio(droneCoordinates.y, droneCoordinates.y + t.vy + dg.vy);
+	infos.ratioZ = findRatio(droneCoordinates.z, droneCoordinates.z + t.vz + dg.vz);
 	//infos.ratioR = findRatio(droneCoordinates.r, droneCoordinates.r + t.vr);
 
 }
@@ -387,20 +397,20 @@ void Arkins::tangent(Coordinates &droneCoordinates, Tangent& tangentPoint, Coord
 	Vector v; //Vecteur tangentiel
 	Vector g; //Vecteur final
 	calculate_vector(tangentPoint, droneCoordinates, td);
-	LOG_F(ERROR, "Tangent Point | isClockwise : %d", tangentPoint.isClockwise);
+	//LOG_F(ERROR, "Tangent Point | isClockwise : %d", tangentPoint.isClockwise);
 	if(tangentPoint.isClockwise){ //clockwise
-		v.vx = td.vx;
-		v.vy = -td.vy;
+		v.vx = td.vy;
+		v.vy = -td.vx;
 		v.vz = td.vz;
 		v.vr = td.vr;
 	}
 	else{ //Counter clockwise
-		v.vx = -td.vx;
-		v.vy = td.vy;
+		v.vx = -td.vy;
+		v.vy = td.vx;
 		v.vz = td.vz;
 		v.vr = td.vr;
 	}
-	calculate_vector(tangentPoint, goalPoint, db);
+	calculate_vector(droneCoordinates, goalPoint, db);
 	g.vx = db.vx + v.vx;
 	g.vy = db.vy + v.vy;
 	g.vz = db.vz + v.vz;

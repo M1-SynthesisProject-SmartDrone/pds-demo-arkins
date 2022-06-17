@@ -157,7 +157,7 @@ void Renderer::renderUniformFields(std::vector<Uniform>& uniformFields, sf::Rend
         // Here, b is unit vector, b = (0, -1) and |b| = 1
         int vx = field.wayx, vy = field.wayy;
         float vNorm = sqrt(vx * vx + vy * vy);
-        float sign = vx < 0 || vy < 0 ? -1.f : 1.f;
+        float sign = vx < 0 || vy < 0 ? 1.f : -1.f;
         float angleDeg = sign * acos((vy * -1.f) / vNorm) * 180.f / M_PI;
         if (angleDeg > 0.f)
         {
